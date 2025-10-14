@@ -1,3 +1,22 @@
+<body>
+  <script>
+    const PASSWORD = "0509";
+    function checkPassword() {
+      const userInput = prompt("🔐 パスコードを入力してください:");
+      if (userInput !== PASSWORD) {
+        alert("❌ パスワードが違います");
+        location.reload();
+      } else {
+        alert("✅ ログイン成功");
+      }
+    }
+    window.onload = checkPassword;
+  </script>
+
+  <!-- ↓ ここから下はあなたのアプリ本体 -->
+  <h1>BIZ.PICK.CL</h1>
+  <button>OCR実行</button>
+</body>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -551,4 +570,5 @@ applyLangUI();
 </script>
 </body>
 </html>
+
 
