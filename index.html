@@ -62,7 +62,7 @@
   </header>
 
     <section id="page-user" class="card">
-    <div><strong id="lblUser">ユーザー</strong></div>
+    <div><strong id="lblUser">ユーザーログイン</strong></div>
     <input id="userName" type="text" placeholder="ユーザー名を入力（例：A01）" autocomplete="off">
     <div style="display:flex;gap:8px;margin-top:8px">
       <button id="btnStart" class="btn-primary" style="flex:1">Start</button>
@@ -72,6 +72,7 @@
   </section>
 
     <section id="page-reg" class="card hidden">
+    <h2 style="margin-top:0">チェック待ちリストの登録</h2>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
       <select id="groupSelect" style="flex:1"></select>
       <input id="newGroupName" type="text" placeholder="New group name">
@@ -104,40 +105,41 @@
     <hr>
 
     <div>
-      <h3 id="listTitle">番号一覧（必要数を入力 → グループ名を設定）</h3>
+      <h3 id="listTitle">番号一覧（必要数を入力 → グループを設定）</h3>
       <div id="listArea" class="card" style="padding:10px;max-height:320px;overflow:auto"></div>
 
       <div style="display:flex;gap:8px;margin-top:12px">
         <button id="btnAssignGroups" class="btn-accent" style="flex:1">グループを確定して保存</button>
         <button id="btnBulkGroup" class="smallBtn">選択を一括でグループ化</button>
       </div>
+      
     </div>
 
     <div style="display:flex;gap:8px;margin-top:12px">
-      <button id="btnToCheck" class="btn-accent" style="flex:1">チェック画面へ</button>
+      <button id="btnToCheck" class="btn-accent" style="flex:1">チェック済み画面へ</button>
       <button id="btnLogout" class="smallBtn">Logout</button>
     </div>
   </section>
 
     <section id="page-check" class="card hidden">
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong id="checkTitle">チェック</strong><div class="muted" id="checkHint">Type 7-digit number to auto-match</div></div>
-      <div><button id="btnBackToReg" class="smallBtn">← Back</button></div>
+      <div><strong id="checkTitle">番号チェック（チェック済み）</strong><div class="muted" id="checkHint">Type 7-digit number to auto-match</div></div>
+      <div><button id="btnBackToReg" class="smallBtn">← チェック待ちへ</button></div>
     </div>
 
     <div style="margin-top:12px">
       <input id="checkInput" type="text" placeholder="Enter 7-digit number" inputmode="numeric" pattern="[0-9]*" maxlength="7">
-      <div style="margin-top:8px" class="muted">Tip: 7桁を入力すると自動で判定します</div>
+      <div style="margin-top:8px" class="muted">Tip: 7桁を入力（バーコードリーダー可）すると自動で判定します</div>
     </div>
 
     <div style="margin-top:12px">
       <div id="stats" class="muted"></div>
       <div class="filterBar" id="filterBar"></div>
 
-      <h4 id="pendingLabel">Pending</h4>
+      <h4 id="pendingLabel">チェック待ち (Pending)</h4>
       <div id="pendingArea" style="min-height:80px"></div>
 
-      <h4 id="doneLabel" style="margin-top:12px">Checked</h4>
+      <h4 id="doneLabel" style="margin-top:12px">チェック済み (Checked)</h4>
       <div id="doneArea"></div>
     </div>
   </section>
@@ -204,13 +206,14 @@ function existsAny(num){ for(const g in store.groups){ if((store.groups[g].items
 
 /* ---- language UI ---- */
 function applyLangUI(){
-  $('#lblUser').textContent = lang==='ja' ? 'ユーザー' : 'User';
+  $('#lblUser').textContent = lang==='ja' ? 'ユーザーログイン' : 'User Login'; 
   btnStart.textContent = tr('start'); btnClearUser.textContent = tr('clear'); btnAddGroup.textContent = tr('addGroup');
   btnRecognize.textContent = tr('ocrRun'); btnResetDetected.textContent = tr('reset'); btnAddManual.textContent = tr('add');
-  btnAssignGroups.textContent = tr('assign'); btnBulkGroup.textContent = tr('bulkGroup'); btnToCheck.textContent = tr('toCheck');
-  btnLogout.textContent = tr('logout'); $('#btnBackToReg').textContent = tr('back');
+  btnAssignGroups.textContent = tr('assign'); btnBulkGroup.textContent = tr('bulkGroup'); btnToCheck.textContent = lang==='ja' ? 'チェック済み画面へ' : tr('toCheck'); 
+  btnLogout.textContent = tr('logout'); $('#btnBackToReg').textContent = lang==='ja' ? '← チェック待ちへ' : tr('back'); 
   instr.textContent = tr('instr'); detHeader && (detHeader.textContent = tr('detHeader'));
-  $('#pendingLabel').textContent = tr('pending'); $('#doneLabel').textContent = tr('done');
+  $('#pendingLabel').textContent = lang==='ja' ? 'チェック待ち (Pending)' : 'Pending'; 
+  $('#doneLabel').textContent = lang==='ja' ? 'チェック済み (Checked)' : 'Checked'; 
   listTitle.textContent = lang==='ja' ? '番号一覧（必要数を入力 → グループを設定）' : 'Number list (enter qty → assign group)';
   langToggle.textContent = lang==='ja' ? 'English' : '日本語';
 }
@@ -242,7 +245,7 @@ btnStart.addEventListener('click', ()=>{
   refreshGroupSelect();
   itemsBuffer = []; renderListArea();
   renderPendingDone();
-  showPage('reg');
+  showPage('reg'); 
 });
 btnClearUser.addEventListener('click', ()=>{
   if(!confirm('Clear all local users?')) return;
@@ -419,11 +422,13 @@ btnAssignGroups.addEventListener('click', ()=>{
 /* ---- render pending/done aggregated by groups ---- */
 function renderPendingDone(filterGroup='All'){
   pendingArea.innerHTML = ''; doneArea.innerHTML = ''; stats.textContent = ''; filterBar.innerHTML='';
-  // build list of groups for filter bar
+  
   const groupNames = ['All', ...Object.keys(store.groups || {})];
   groupNames.forEach(g => {
     const b = document.createElement('button'); b.className='smallBtn'; b.textContent = g;
-    b.onclick = ()=> renderPendingDone(g);
+    // リアルタイム更新時にフィルターを維持する
+    if(g === filterGroup) b.style.backgroundColor = '#0b67c2'; b.style.color = 'white'; 
+    b.onclick = ()=> { currentFilter = g; renderPendingDone(g); };
     filterBar.appendChild(b);
   });
 
@@ -446,9 +451,12 @@ function renderPendingDone(filterGroup='All'){
       left.onclick = ()=> { copyText(a.num); showToast(tr('copied')); };
       const right = document.createElement('div'); right.style.display='flex'; right.style.gap='8px'; right.style.alignItems='center';
       const remDiv = document.createElement('div'); remDiv.textContent = a.rem; remDiv.style.minWidth='40px';
+      // リアルタイム更新のため、-1ボタンは残りの数量が1個以上の場合に表示
       const quick = document.createElement('button'); quick.className='smallBtn'; quick.textContent='-1';
       quick.onclick = ()=> doCheckNumber(a.num, 1);
-      right.appendChild(remDiv); right.appendChild(quick);
+      right.appendChild(remDiv); 
+      if (a.rem > 0) right.appendChild(quick); // 残りがある場合のみ-1ボタンを表示
+
       row.appendChild(left); row.appendChild(right);
       pendingArea.appendChild(row);
     } else {
@@ -481,25 +489,33 @@ function doCheckNumber(num, quickQty=null){
   const it = found.item;
   const rem = (it.qty||0) - (it.done||0);
   if(rem <= 0){ showToast('Already done'); return; }
+  
+  let checkedQty = 0;
+  
   if(quickQty !== null){
-    const use = Math.min(quickQty, rem);
-    it.done = (it.done||0) + use;
-    saveUserStore(); renderPendingDone(currentFilter); return;
+    checkedQty = Math.min(quickQty, rem);
+  } else if(rem === 1){
+    checkedQty = 1;
+  } else {
+    // prompt until valid or cancelled (複数個入力の場合)
+    while(true){
+      const p = prompt(tr('promptQty', { num: it.num, rem: rem }), '1');
+      if(p === null) return;
+      const s = p.trim();
+      if(!/^\d+$/.test(s)){ alert('Enter a positive integer'); continue; }
+      const c = parseInt(s,10);
+      if(c < 1){ alert('Enter > 0'); continue; }
+      if(c > rem){ alert(tr('overCheck')); continue; }
+      checkedQty = c;
+      break;
+    }
   }
-  if(rem === 1){
-    it.done = it.qty; saveUserStore(); renderPendingDone(currentFilter); return;
-  }
-  // prompt until valid or cancelled
-  while(true){
-    const p = prompt(tr('promptQty', { num: it.num, rem: rem }), '1');
-    if(p === null) return;
-    const s = p.trim();
-    if(!/^\d+$/.test(s)){ alert('Enter a positive integer'); continue; }
-    const c = parseInt(s,10);
-    if(c < 1){ alert('Enter > 0'); continue; }
-    if(c > rem){ alert(tr('overCheck')); continue; }
-    it.done = (it.done||0) + c;
-    saveUserStore(); renderPendingDone(currentFilter); return;
+  
+  // リアルタイム更新: 完了個数を加算して保存し、リストを更新
+  if (checkedQty > 0) {
+    it.done = (it.done||0) + checkedQty;
+    saveUserStore(); 
+    renderPendingDone(currentFilter); // リアルタイム更新
   }
 }
 
@@ -512,7 +528,6 @@ checkInput.addEventListener('change', (e) => {
 });
 
 // 手入力で7桁になった瞬間に自動チェックする機能
-// ※ inputイベントは文字が入力されるたびに発生
 checkInput.addEventListener('input', (e) => {
   const v = (e.target.value || '').trim();
   if (/^\d{7}$/.test(v)) {
@@ -532,7 +547,7 @@ function processCheckInput(inputVal) {
       return;
     }
     
-    doCheckNumber(v);
+    doCheckNumber(v); // 処理の中で renderPendingDone が呼ばれる
     checkInput.value = ''; // 処理後にクリア
   } else {
     checkInput.value = v; // 7桁未満の場合は、数字のみを保持
@@ -541,9 +556,9 @@ function processCheckInput(inputVal) {
 
 
 /* ---- navigation buttons ---- */
-btnToCheck.addEventListener('click', ()=>{ saveUserStore(); currentFilter='All'; renderPendingDone('All'); showPage('check'); });
-btnBackToReg.addEventListener('click', ()=>{ showPage('reg'); });
-btnLogout.addEventListener('click', ()=>{ currentUser=null; store={groups:{}}; itemsBuffer=[]; showPage('user'); });
+btnToCheck.addEventListener('click', ()=>{ saveUserStore(); currentFilter='All'; renderPendingDone('All'); showPage('check'); }); // チェック済みページへ
+btnBackToReg.addEventListener('click', ()=>{ showPage('reg'); }); // チェック待ちページへ
+btnLogout.addEventListener('click', ()=>{ currentUser=null; store={groups:{}}; itemsBuffer=[]; showPage('user'); }); // ログインページへ
 
 /* ---- helper copy ---- */
 function copyText(txt){ if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).catch(()=>prompt('Copy:', txt)); else prompt('Copy:', txt); }
