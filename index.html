@@ -1,502 +1,196 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Indent — チェックリスト</title>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <style>
-    :root{--bg:#f7f8fb;--card:#fff;--primary:#0b67c2;--accent:#16a34a;--danger:#ef4444}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans JP',sans-serif;background:var(--bg);color:#111}
-    .wrap{max-width:920px;margin:0 auto;padding:12px 10px 120px}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-    h1{font-size:20px;margin:0}
-    .langBtn{background:#444;color:#fff;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
-    .card{background:var(--card);border-radius:12px;padding:12px;margin-bottom:12px;box-shadow:0 2px 6px rgba(0,0,0,0.06)}
-    .muted{color:#666;font-size:13px}
-    input[type=file]{width:100%}
-    .row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #eee}
-    input, button, select{font-size:16px}
-    input[type="number"], input[type="text"], select{padding:8px;border-radius:8px;border:1px solid #ddd;width:100%}
-    button{height:44px;border-radius:10px;border:none;padding:0 14px;cursor:pointer}
-    .btn-primary{background:var(--primary);color:white}
-    .btn-accent{background:var(--accent);color:white}
-    .btn-danger{background:var(--danger);color:white}
-    .hidden{display:none}
-    .itemRow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0}
-    .smallBtn{padding:6px 8px;border-radius:6px;border:none;cursor:pointer;background:#ddd;height:auto}
-    #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:rgba(0,0,0,0.8);color:#fff;padding:8px 12px;border-radius:8px;display:none;font-size:14px;z-index:9999}
-    .highlight{background:#ffeb3b;transition:background 0.3s}
-    nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#000;z-index:20;max-width:920px;margin:0 auto}
-    nav button{flex:1;border:none;border-right:1px solid #fff;background:#000;color:#fff;padding:10px;cursor:pointer;height:auto;border-radius:0}
-    nav button.active{background:#444}
-    nav button:last-child{border-right:none}
-    @media (max-width:640px){ .wrap{padding:10px} button{height:46px} }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>BIZ.PICK.CL 完全版</title>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+:root{--bg:#f7f8fb;--card:#fff;--primary:#0b67c2;--accent:#16a34a;--danger:#ef4444}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans JP',sans-serif;background:var(--bg);color:#111}
+.wrap{max-width:920px;margin:0 auto;padding:12px 10px 120px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+h1{font-size:20px;margin:0}
+.langBtn{background:#444;color:#fff;padding:8px 12px;border-radius:8px;border:none}
+.card{background:var(--card);border-radius:12px;padding:12px;margin-bottom:12px;box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+.muted{color:#666;font-size:13px}
+input[type=file]{width:100%}
+input, button, select{font-size:16px}
+input[type="number"], input[type="text"], select{padding:8px;border-radius:8px;border:1px solid #ddd;width:100%}
+button{height:44px;border-radius:10px;border:none;padding:0 14px;cursor:pointer}
+.btn-primary{background:var(--primary);color:white}
+.btn-accent{background:var(--accent);color:white}
+.btn-danger{background:var(--danger);color:white}
+.itemRow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.smallBtn{padding:6px 8px;border-radius:6px;border:none;cursor:pointer;background:#ddd}
+.filterBar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:rgba(0,0,0,0.8);color:#fff;padding:8px 12px;border-radius:8px;display:none;font-size:14px;z-index:9999}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1 id="appTitle">Indent — チェックリスト</h1>
-      <button id="langToggle" class="langBtn">English</button>
-    </header>
+<script>
+const PASSWORD = "0509";
+function checkPassword() {
+  const userInput = prompt("🔐 パスコードを入力してください:");
+  if (userInput !== PASSWORD) { alert("❌ パスワードが違います"); location.reload(); }
+  else { alert("✅ ログイン成功"); }
+}
+window.onload = checkPassword;
+</script>
 
-    <!-- PASSWORD PAGE -->
-    <section id="page-password" class="card">
-      <div><strong id="lblPassword">パスワード入力</strong></div>
-      <input id="passwordInput" type="password" placeholder="パスワードを入力">
+<div class="wrap">
+  <header>
+    <h1>BIZ.PICK.CL 完全版</h1>
+    <button id="langToggle" class="langBtn">English</button>
+  </header>
+
+  <!-- ユーザー入力 -->
+  <section id="page-user" class="card">
+    <input id="userName" type="text" placeholder="ユーザー名を入力（例：A01）">
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button id="btnStart" class="btn-primary" style="flex:1">Start</button>
+      <button id="btnClearUser" class="btn-danger" style="width:110px">Clear</button>
+    </div>
+  </section>
+
+  <!-- 登録・OCR・グループ設定 -->
+  <section id="page-reg" class="card hidden">
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <select id="groupSelect" style="flex:1"></select>
+      <input id="newGroupName" type="text" placeholder="New group name">
+      <button id="btnAddGroup" class="smallBtn">Add</button>
+    </div>
+
+    <div>1) カメラで撮影または画像を選択（7桁を検出）</div>
+    <input id="imgInput" type="file" accept="image/*" capture="environment">
+
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button id="btnRecognize" class="btn-primary" style="flex:1">OCR実行</button>
+      <button id="btnResetDetected" class="btn-danger" style="width:110px">Reset</button>
+    </div>
+
+    <div style="margin-top:12px">
+      <div>または手入力で追加</div>
       <div style="display:flex;gap:8px;margin-top:8px">
-        <button id="passwordSubmit" class="btn-primary" style="flex:1">ログイン</button>
+        <input id="manualNum" type="text" placeholder="7桁番号を入力">
+        <button id="btnAddManual" class="smallBtn">追加</button>
       </div>
-      <p id="passwordError" style="color:var(--danger);display:none;margin-top:8px">パスワードが違います</p>
-    </section>
+    </div>
 
-    <!-- USER PAGE -->
-    <section id="page-user" class="card hidden">
-      <div><strong id="lblUser">ユーザー</strong></div>
-      <input id="userIdInput" type="text" placeholder="ユーザーIDを入力">
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button id="loginSubmit" class="btn-primary" style="flex:1">ログイン</button>
-        <button id="btnClearUser" class="btn-danger" style="width:110px">Clear</button>
-      </div>
-    </section>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button id="btnToCheckPage" class="btn-accent" style="flex:1">チェック画面へ</button>
+      <button id="btnLogoutReg" class="smallBtn">Logout</button>
+    </div>
 
-    <!-- PRE-CHECK PAGE -->
-    <section id="page-precheck" class="card hidden">
-      <div><strong id="precheckTitle">チェック待ちリスト</strong></div>
-      
-      <div class="muted" style="margin-top:8px" id="instrOCR">カメラで撮影または画像を選択（7桁を検出）</div>
-      <input id="imgInput" type="file" accept="image/*" capture="environment" style="margin-top:8px">
-      
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button id="ocrBtn" class="btn-primary" style="flex:1">OCR実行</button>
-        <button id="precheckReset" class="btn-danger" style="width:110px">リセット</button>
-      </div>
+    <h3>番号一覧</h3>
+    <div id="listArea" style="padding:10px;max-height:320px;overflow:auto;background:#f9f9f9;border-radius:8px;"></div>
+  </section>
 
-      <div style="margin-top:12px">
-        <div class="muted" id="instrManual">または手入力で追加</div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <input id="productCodeInput" type="text" placeholder="7桁のコード">
-          <input id="productQtyInput" type="number" min="1" value="1" style="width:90px">
-          <input id="productMemoInput" type="text" placeholder="メモ">
-        </div>
-        <button id="addProductBtn" class="smallBtn" style="width:100%;margin-top:8px">追加</button>
-      </div>
+  <!-- チェック画面 -->
+  <section id="page-check" class="card hidden">
+    <input id="checkInput" type="text" placeholder="7桁番号を入力">
+    <button id="btnCheckAll" class="btn-accent" style="width:100%">一括チェック</button>
+    <div id="stats" class="muted" style="margin-top:6px"></div>
+    <div class="filterBar" id="filterBar"></div>
 
-      <hr style="margin:16px 0;border:none;border-top:1px solid #eee">
+    <h4>Pending</h4>
+    <div id="pendingArea" style="min-height:80px"></div>
+    <h4>Checked</h4>
+    <div id="doneArea"></div>
 
-      <div>
-        <h3 id="listTitle">番号一覧</h3>
-        <div id="precheckList" style="max-height:320px;overflow:auto"></div>
-      </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button id="btnBackToRegCheck" class="smallBtn">← Back</button>
+      <button id="btnDeleteAllCheck" class="btn-danger" style="flex:1">すべて削除</button>
+    </div>
+  </section>
+</div>
 
-      <button id="precheckConfirm" class="btn-accent" style="width:100%;margin-top:12px">チェックリストへ確定</button>
-    </section>
+<div id="toast"></div>
 
-    <!-- CHECKLIST PAGE -->
-    <section id="page-checklist" class="card hidden">
-      <div><strong id="checklistTitle">チェックリスト</strong></div>
+<script>
+const PREFIX = 'BIZPICK_CL_v3_';
+let currentUser = null;
+let store = { groups: {} };
+let currentFilter = 'All';
+const $ = s => document.querySelector(s);
 
-      <div style="margin-top:12px">
-        <input id="searchCodeInput" type="text" placeholder="コードを検索" inputmode="numeric">
-        <div class="muted" style="margin-top:4px" id="searchHint">7桁を入力すると自動で判定します</div>
-      </div>
+// --- DOM Elements ---
+const pageUser = $('#page-user'), pageReg = $('#page-reg'), pageCheck = $('#page-check');
+const userNameInput = $('#userName'), btnStart = $('#btnStart'), btnClearUser = $('#btnClearUser');
+const langToggle = $('#langToggle');
+const groupSelect = $('#groupSelect'), newGroupName = $('#newGroupName'), btnAddGroup = $('#btnAddGroup');
+const imgInput = $('#imgInput'), btnRecognize = $('#btnRecognize');
+const btnResetDetected = $('#btnResetDetected'), manualNum = $('#manualNum'), btnAddManual = $('#btnAddManual');
+const listArea = $('#listArea'), btnToCheckPage = $('#btnToCheckPage'), btnLogoutReg = $('#btnLogoutReg');
+const btnBackToRegCheck = $('#btnBackToRegCheck'), checkInput = $('#checkInput');
+const pendingArea = $('#pendingArea'), doneArea = $('#doneArea'), stats = $('#stats');
+const filterBar = $('#filterBar'), btnCheckAll = $('#btnCheckAll'), btnDeleteAllCheck = $('#btnDeleteAllCheck');
+const toast = $('#toast');
 
-      <div style="margin-top:12px">
-        <div id="stats" class="muted"></div>
-        <h4 id="pendingLabel">チェック待ち</h4>
-        <div id="checklist"></div>
-      </div>
-
-      <button id="checklistReset" class="btn-danger" style="width:100%;margin-top:12px">リセット</button>
-    </section>
-
-    <!-- CHECKED PAGE -->
-    <section id="page-checked" class="card hidden">
-      <div><strong id="checkedTitle">チェック済みリスト</strong></div>
-      <div id="checkedList" style="margin-top:12px"></div>
-    </section>
-  </div>
-
-  <nav id="mainNav" class="hidden">
-    <button id="navPrecheck">チェック前リスト</button>
-    <button id="navChecklist">チェックリスト</button>
-    <button id="navChecked">チェック済み一覧</button>
-  </nav>
-
-  <div id="toast"></div>
-
-  <script>
-    const PASSWORD = '0509';
-    const PREFIX = 'INDENT_v1_';
-    let currentUser = null;
-    let lang = localStorage.getItem(PREFIX + 'lang') || 'ja';
-    let precheckList = [];
-    let checklist = [];
-    let checkedList = [];
-
-    const texts = {
-      ja: {
-        passwordTitle:'パスワード入力', passwordPlaceholder:'パスワードを入力', loginBtn:'ログイン',
-        userTitle:'ユーザー', userPlaceholder:'ユーザーIDを入力', clear:'Clear',
-        precheckTitle:'チェック待ちリスト', checklistTitle:'チェックリスト', checkedTitle:'チェック済みリスト',
-        wrongPass:'パスワードが違います', add:'追加', ocr:'OCR実行', confirm:'チェックリストへ確定',
-        reset:'リセット', del:'削除', check:'✔', logout:'Logout', back:'← 戻る',
-        codePlaceholder:'7桁のコード', qtyLabel:'数量', memoPlaceholder:'メモ',
-        searchPlaceholder:'コードを検索', searchHint:'7桁を入力すると自動で判定します',
-        instrOCR:'カメラで撮影または画像を選択（7桁を検出）', instrManual:'または手入力で追加',
-        listTitle:'番号一覧', pending:'チェック待ち', done:'チェック済み',
-        navPrecheck:'チェック前リスト', navChecklist:'チェックリスト', navChecked:'チェック済み一覧',
-        notFound:'該当番号が見つかりません', alertId:'IDを入力してください',
-        alertCode:'7桁のコードを入力してください', noImage:'画像を選択してください',
-        noDetected:'7桁が検出されませんでした', confirmReset:'本当にリセットしますか？',
-        confirmChecklistReset:'チェックリストをリセットしますか？', copied:'コピーしました',
-        processing:'処理中...', ocrDone:'OCR完了'
-      },
-      en: {
-        passwordTitle:'Enter Password', passwordPlaceholder:'Enter password', loginBtn:'Login',
-        userTitle:'User', userPlaceholder:'Enter User ID', clear:'Clear',
-        precheckTitle:'Pre-Check List', checklistTitle:'Checklist', checkedTitle:'Checked Items',
-        wrongPass:'Incorrect password', add:'Add', ocr:'Run OCR', confirm:'Confirm to Checklist',
-        reset:'Reset', del:'Delete', check:'✔', logout:'Logout', back:'← Back',
-        codePlaceholder:'7-digit code', qtyLabel:'Qty', memoPlaceholder:'Memo',
-        searchPlaceholder:'Search code', searchHint:'Enter 7 digits to auto-match',
-        instrOCR:'Take photo or choose image (detect 7-digit)', instrManual:'Or add manually',
-        listTitle:'Number list', pending:'Pending', done:'Checked',
-        navPrecheck:'Pre-Check', navChecklist:'Checklist', navChecked:'Checked',
-        notFound:'Not found', alertId:'Please enter ID',
-        alertCode:'Please enter 7-digit code', noImage:'Please select an image',
-        noDetected:'No 7-digit numbers found', confirmReset:'Really reset?',
-        confirmChecklistReset:'Reset checklist?', copied:'Copied',
-        processing:'Processing...', ocrDone:'OCR Done'
-      }
-    };
-
-    function tr(k){ return texts[lang][k] || k; }
-    function showToast(msg, ms=900){ toast.textContent = msg; toast.style.display='block'; setTimeout(()=>toast.style.display='none', ms); }
-
-    const pages = ['page-password','page-user','page-precheck','page-checklist','page-checked'];
-    const mainNav = document.getElementById('mainNav');
-    
-    function showPage(id){
-      pages.forEach(p=>document.getElementById(p).classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-      
-      // ナビゲーションの表示/非表示とアクティブ状態
-      if(['page-precheck','page-checklist','page-checked'].includes(id)){
-        mainNav.classList.remove('hidden');
-        document.querySelectorAll('nav button').forEach(btn=>btn.classList.remove('active'));
-        if(id==='page-precheck') document.getElementById('navPrecheck').classList.add('active');
-        if(id==='page-checklist') document.getElementById('navChecklist').classList.add('active');
-        if(id==='page-checked') document.getElementById('navChecked').classList.add('active');
-      } else {
-        mainNav.classList.add('hidden');
-      }
-    }
-
-    function saveData(){
-      if(!currentUser) return;
-      const data = { precheck: precheckList, checklist: checklist, checked: checkedList };
-      localStorage.setItem(PREFIX + currentUser, JSON.stringify(data));
-      localStorage.setItem(PREFIX + 'lang', lang);
-    }
-
-    function loadData(){
-      if(!currentUser) return;
-      const raw = localStorage.getItem(PREFIX + currentUser);
-      if(raw){
-        try{
-          const data = JSON.parse(raw);
-          precheckList = data.precheck || [];
-          checklist = data.checklist || [];
-          checkedList = data.checked || [];
-        } catch(e){
-          precheckList = []; checklist = []; checkedList = [];
-        }
-      } else {
-        precheckList = []; checklist = []; checkedList = [];
-      }
-    }
-
-    function applyLang(){
-      document.getElementById('lblPassword').textContent = tr('passwordTitle');
-      document.getElementById('passwordInput').placeholder = tr('passwordPlaceholder');
-      document.getElementById('passwordSubmit').textContent = tr('loginBtn');
-      document.getElementById('passwordError').textContent = tr('wrongPass');
-      document.getElementById('lblUser').textContent = tr('userTitle');
-      document.getElementById('userIdInput').placeholder = tr('userPlaceholder');
-      document.getElementById('loginSubmit').textContent = tr('loginBtn');
-      document.getElementById('btnClearUser').textContent = tr('clear');
-      document.getElementById('precheckTitle').textContent = tr('precheckTitle');
-      document.getElementById('checklistTitle').textContent = tr('checklistTitle');
-      document.getElementById('checkedTitle').textContent = tr('checkedTitle');
-      document.getElementById('instrOCR').textContent = tr('instrOCR');
-      document.getElementById('instrManual').textContent = tr('instrManual');
-      document.getElementById('productCodeInput').placeholder = tr('codePlaceholder');
-      document.getElementById('productMemoInput').placeholder = tr('memoPlaceholder');
-      document.getElementById('addProductBtn').textContent = tr('add');
-      document.getElementById('ocrBtn').textContent = tr('ocr');
-      document.getElementById('precheckConfirm').textContent = tr('confirm');
-      document.getElementById('precheckReset').textContent = tr('reset');
-      document.getElementById('searchCodeInput').placeholder = tr('searchPlaceholder');
-      document.getElementById('searchHint').textContent = tr('searchHint');
-      document.getElementById('checklistReset').textContent = tr('reset');
-      document.getElementById('listTitle').textContent = tr('listTitle');
-      document.getElementById('pendingLabel').textContent = tr('pending');
-      document.getElementById('navPrecheck').textContent = tr('navPrecheck');
-      document.getElementById('navChecklist').textContent = tr('navChecklist');
-      document.getElementById('navChecked').textContent = tr('navChecked');
-      document.getElementById('langToggle').textContent = lang==='ja' ? 'English' : '日本語';
-      renderPrecheck(); renderChecklist(); renderChecked();
-    }
-
-    document.getElementById('langToggle').addEventListener('click',()=>{
-      lang = (lang==='ja') ? 'en' : 'ja';
-      applyLang();
+// --- helpers ---
+function showToast(msg, ms=900){ toast.textContent=msg; toast.style.display='block'; setTimeout(()=>toast.style.display='none',ms);}
+function saveUserStore(){ if(!currentUser) return; localStorage.setItem(PREFIX+currentUser,JSON.stringify(store)); }
+function loadUserStore(user){ const raw = localStorage.getItem(PREFIX+user); store = raw?JSON.parse(raw):{groups:{}}; }
+function showPage(p){ pageUser.classList.add('hidden'); pageReg.classList.add('hidden'); pageCheck.classList.add('hidden'); if(p==='user') pageUser.classList.remove('hidden'); if(p==='reg') pageReg.classList.remove('hidden'); if(p==='check') pageCheck.classList.remove('hidden'); }
+function findItem(num){ for(const g in store.groups){ const it = (store.groups[g].items||[]).find(x=>x.num===num); if(it) return {group:g,item:it}; } return null; }
+function renderPendingDone(){
+  pendingArea.innerHTML=''; doneArea.innerHTML=''; stats.textContent=''; filterBar.innerHTML='';
+  const groups=['All',...Object.keys(store.groups)];
+  groups.forEach(g=>{
+    const btn=document.createElement('button'); btn.textContent=g; btn.className='smallBtn';
+    btn.onclick=()=>{ currentFilter=g; renderPendingDone(); };
+    filterBar.appendChild(btn);
+  });
+  let pendingCount=0,pendingQty=0,doneCount=0,doneQty=0;
+  for(const g in store.groups){
+    if(currentFilter!=='All'&&g!==currentFilter) continue;
+    (store.groups[g].items||[]).forEach(it=>{
+      const rem=(it.qty||1)-(it.done||0);
+      const row=document.createElement('div'); row.className='itemRow';
+      const left=document.createElement('div'); left.textContent=it.num+' ('+g+')'; left.style.cursor='pointer';
+      left.onclick=()=>{ navigator.clipboard?.writeText(it.num); showToast('Copied'); };
+      const right=document.createElement('div'); right.style.display='flex'; right.style.gap='8px';
+      const remDiv=document.createElement('div'); remDiv.textContent=rem; remDiv.style.minWidth='30px';
+      const quick=document.createElement('button'); quick.textContent='-1'; quick.className='smallBtn';
+      quick.onclick=()=>{ it.done+=1; saveUserStore(); renderPendingDone(); };
+      right.appendChild(remDiv); right.appendChild(quick);
+      row.appendChild(left); row.appendChild(right);
+      if(rem>0) pendingArea.appendChild(row); else { doneArea.appendChild(row); left.textContent+=` ✔ ${it.done}/${it.qty}`; left.style.color='green'; }
+      if(rem>0){ pendingCount++; pendingQty+=rem; } else { doneCount++; doneQty+=it.done||1; }
     });
+  }
+  stats.textContent=`Pending:${pendingCount}(${pendingQty}) / Done:${doneCount}(${doneQty})`;
+}
 
-    // Password
-    document.getElementById('passwordSubmit').onclick=()=>{
-      const val=document.getElementById('passwordInput').value;
-      if(val===PASSWORD){ 
-        showPage('page-user'); 
-      } else { 
-        const err=document.getElementById('passwordError'); 
-        err.style.display='block'; 
-        setTimeout(()=>err.style.display='none',2000); 
-      }
-    };
+// --- events ---
+btnStart.onclick=()=>{
+  const name=userNameInput.value.trim(); if(!name){ alert('Enter user'); return; }
+  currentUser=name; loadUserStore(currentUser); showPage('reg'); renderPendingDone(); showToast('Welcome '+currentUser);
+};
+btnClearUser.onclick=()=>{ localStorage.removeItem(PREFIX+userNameInput.value); showToast('Cleared'); };
+btnLogoutReg.onclick=()=>{ currentUser=null; store={groups:{}}; showPage('user'); };
+btnToCheckPage.onclick=()=>{ renderPendingDone(); showPage('check'); };
+btnBackToRegCheck.onclick=()=>{ showPage('reg'); };
+btnDeleteAllCheck.onclick=()=>{
+  if(!confirm('番号をすべて削除しますか？')) return;
+  for(const g in store.groups){ store.groups[g].items=[]; } saveUserStore(); renderPendingDone(); showToast('削除完了'); };
+btnCheckAll.onclick=()=>{ for(const g in store.groups){ if(currentFilter!=='All'&&g!==currentFilter) continue; (store.groups[g].items||[]).forEach(it=>it.done=it.qty||1); } saveUserStore(); renderPendingDone(); showToast('All checked'); };
 
-    // Login
-    document.getElementById('loginSubmit').onclick=()=>{
-      const id=document.getElementById('userIdInput').value.trim();
-      if(!id) return alert(tr('alertId'));
-      currentUser = id;
-      localStorage.setItem(PREFIX + 'lastUser', id);
-      loadData();
-      renderPrecheck(); renderChecklist(); renderChecked();
-      showPage('page-precheck');
-    };
+// --- manual add ---
+btnAddManual.onclick=()=>{
+  const val=manualNum.value.trim(); if(!/^\d{7}$/.test(val)){ showToast('7桁入力'); return; }
+  const grp=groupSelect.value||'Default';
+  store.groups[grp]=store.groups[grp]||{items:[]};
+  if(!store.groups[grp].items.find(x=>x.num===val)) store.groups[grp].items.push({num:val,qty:1,done:0});
+  manualNum.value=''; saveUserStore(); renderPendingDone(); showToast('追加');
+};
 
-    document.getElementById('btnClearUser').onclick=()=>{
-      if(!confirm('Clear all local users?')) return;
-      for(const k in {...localStorage}) if(k.startsWith(PREFIX)) localStorage.removeItem(k);
-      alert('Cleared.');
-    };
-
-    function renderPrecheck(){
-      const el=document.getElementById('precheckList'); el.innerHTML='';
-      if(precheckList.length === 0){
-        el.innerHTML = `<div class="muted">${lang==='ja' ? '番号がありません' : 'No numbers yet'}</div>`;
-        return;
-      }
-      precheckList.forEach((item,i)=>{
-        const div=document.createElement('div');
-        div.className='itemRow';
-        const left = document.createElement('div');
-        left.style.flex = '1';
-        left.innerHTML = `<div>${item.code}</div><div style="display:flex;gap:4px;margin-top:4px;font-size:13px">
-          ${tr('qtyLabel')}: <input type='number' class='qtyInput' data-i='${i}' value='${item.qty}' min='1' style="width:70px;padding:4px;font-size:13px">
-          <input type='text' class='memoInput' data-i='${i}' value='${item.memo||''}' placeholder='${tr('memoPlaceholder')}' style="flex:1;padding:4px;font-size:13px">
-        </div>`;
-        const btn = document.createElement('button');
-        btn.className = 'smallBtn';
-        btn.textContent = tr('del');
-        btn.dataset.i = i;
-        div.appendChild(left);
-        div.appendChild(btn);
-        el.appendChild(div);
-      });
-      document.querySelectorAll('.smallBtn').forEach(btn=>btn.onclick=e=>{
-        precheckList.splice(e.target.dataset.i,1); saveData(); renderPrecheck();
-      });
-      document.querySelectorAll('.qtyInput').forEach(input=>input.onchange=e=>{
-        precheckList[e.target.dataset.i].qty=Number(e.target.value); saveData();
-      });
-      document.querySelectorAll('.memoInput').forEach(input=>input.onchange=e=>{
-        precheckList[e.target.dataset.i].memo=e.target.value; saveData();
-      });
-    }
-
-    function renderChecklist(){
-      const el=document.getElementById('checklist'); el.innerHTML='';
-      if(checklist.length === 0){
-        el.innerHTML = `<div class="muted">${lang==='ja' ? 'チェック項目がありません' : 'No items'}</div>`;
-        document.getElementById('stats').textContent = '';
-        return;
-      }
-      const total = checklist.reduce((sum,it)=>sum+it.qty, 0);
-      document.getElementById('stats').textContent = `${tr('pending')}: ${checklist.length} (${total})`;
-      
-      checklist.forEach((item,i)=>{
-        const div=document.createElement('div');
-        div.className='itemRow';
-        div.id=`checklist-item-${i}`;
-        const left = document.createElement('div');
-        left.style.flex = '1';
-        left.style.cursor = 'pointer';
-        left.innerHTML = `<div>${item.code} ×${item.qty}</div>${item.memo ? `<div class="muted" style="font-size:12px">${item.memo}</div>` : ''}`;
-        left.onclick = ()=>{ copyText(item.code); showToast(tr('copied')); };
-        const btn = document.createElement('button');
-        btn.className = 'smallBtn';
-        btn.textContent = tr('check');
-        btn.dataset.i = i;
-        div.appendChild(left);
-        div.appendChild(btn);
-        el.appendChild(div);
-      });
-      document.querySelectorAll('#checklist .smallBtn').forEach(btn=>btn.onclick=e=>{
-        const i=e.target.dataset.i;
-        if(checklist[i].qty>1){ 
-          checklist[i].qty--; 
-          checkedList.push({code:checklist[i].code,qty:1,memo:checklist[i].memo}); 
-        } else { 
-          checkedList.push(checklist[i]); 
-          checklist.splice(i,1); 
-        }
-        saveData(); renderChecklist(); renderChecked();
-      });
-    }
-
-    function renderChecked(){
-      const el=document.getElementById('checkedList'); el.innerHTML='';
-      if(checkedList.length === 0){
-        el.innerHTML = `<div class="muted">${lang==='ja' ? 'チェック済みの項目がありません' : 'No checked items'}</div>`;
-        return;
-      }
-      const grouped = {};
-      checkedList.forEach(it=>{ 
-        if(grouped[it.code]) {
-          grouped[it.code].qty+=it.qty;
-          if(it.memo && !grouped[it.code].memo.includes(it.memo)) {
-            grouped[it.code].memo = grouped[it.code].memo ? `${grouped[it.code].memo}, ${it.memo}` : it.memo;
-          }
-        } else {
-          grouped[it.code]={...it};
-        }
-      });
-      const groupedArray = Object.values(grouped);
-      groupedArray.forEach((it, i)=>{
-        const div=document.createElement('div');
-        div.className='itemRow';
-        const left = document.createElement('div');
-        left.style.flex = '1';
-        left.style.cursor = 'pointer';
-        left.style.color = 'var(--accent)';
-        left.innerHTML = `<div>${it.code} ×${it.qty}</div>${it.memo?`<div class="muted" style="font-size:12px">${it.memo}</div>`:''}`;
-        left.onclick = ()=>{ copyText(it.code); showToast(tr('copied')); };
-        const btn = document.createElement('button');
-        btn.className = 'smallBtn';
-        btn.textContent = tr('del');
-        btn.dataset.code = it.code;
-        div.appendChild(left);
-        div.appendChild(btn);
-        el.appendChild(div);
-      });
-      document.querySelectorAll('#checkedList .smallBtn').forEach(btn=>btn.onclick=e=>{
-        const code = e.target.dataset.code;
-        checkedList = checkedList.filter(it => it.code !== code);
-        saveData(); renderChecked();
-      });
-    }
-
-    document.getElementById('addProductBtn').onclick=()=>{
-      const code=document.getElementById('productCodeInput').value.trim();
-      const qty=Number(document.getElementById('productQtyInput').value)||1;
-      const memo=document.getElementById('productMemoInput').value.trim();
-      if(!/^\d{7}$/.test(code)) return alert(tr('alertCode'));
-      precheckList.push({code,qty,memo}); saveData(); renderPrecheck();
-      document.getElementById('productCodeInput').value=''; 
-      document.getElementById('productMemoInput').value='';
-    };
-
-    document.getElementById('ocrBtn').onclick=async()=>{
-      const file = document.getElementById('imgInput').files[0];
-      if(!file) return alert(tr('noImage'));
-      try{
-        showToast(tr('processing'), 2000);
-        const reader = new FileReader();
-        reader.onload = async(e)=>{
-          const result = await Tesseract.recognize(e.target.result, 'eng', { 
-            tessedit_char_whitelist: '0123456789' 
-          });
-          let txt = result.data.text.replace(/[^\d\s]/g, ' ');
-          const found = (txt.match(/\b\d{7}\b/g) || []).filter(Boolean);
-          const uniqs = [...new Set(found)];
-          if(uniqs.length === 0){ alert(tr('noDetected')); return; }
-          uniqs.forEach(n => {
-            if(!precheckList.find(x=>x.code===n)) precheckList.push({code:n, qty:1, memo:''});
-          });
-          saveData(); renderPrecheck();
-          showToast(tr('ocrDone'));
-        };
-        reader.readAsDataURL(file);
-      } catch(e){
-        alert('OCR error: ' + e.message);
-      }
-    };
-
-    document.getElementById('precheckConfirm').onclick=()=>{ 
-      checklist.push(...precheckList); 
-      precheckList=[]; 
-      saveData(); 
-      renderPrecheck(); 
-      renderChecklist(); 
-      showPage('page-checklist'); 
-    };
-
-    document.getElementById('navPrecheck').onclick = () => showPage('page-precheck');
-    document.getElementById('navChecklist').onclick = () => showPage('page-checklist');
-    document.getElementById('navChecked').onclick = () => showPage('page-checked');
-
-    document.getElementById('precheckReset').onclick=()=>{ 
-      if(confirm(tr('confirmReset'))){ 
-        precheckList=[]; 
-        saveData(); 
-        renderPrecheck(); 
-      } 
-    };
-
-    document.getElementById('checklistReset').onclick=()=>{ 
-      if(confirm(tr('confirmChecklistReset'))){ 
-        checklist=[]; 
-        saveData(); 
-        renderChecklist(); 
-      } 
-    };
-
-    document.getElementById('searchCodeInput').addEventListener('input', (e)=>{
-      const val = e.target.value.trim();
-      if(/^\d{7}$/.test(val)){
-        const index = checklist.findIndex(item => item.code === val);
-        if(index !== -1) {
-          const element = document.getElementById(`checklist-item-${index}`);
-          if(element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            element.classList.add('highlight');
-            setTimeout(() => { element.classList.remove('highlight'); }, 2000);
-          }
-          e.target.value = '';
-        } else {
-          showToast(tr('notFound'));
-          e.target.value = '';
-        }
-      }
-    });
-
-    function copyText(txt){ 
-      if(navigator.clipboard && navigator.clipboard.writeText) 
-        navigator.clipboard.writeText(txt).catch(()=>prompt('Copy:', txt)); 
-      else 
-        prompt('Copy:', txt); 
-    }
-
-    const last = localStorage.getItem(PREFIX + 'lastUser'); 
-    if(last) document.getElementById('userIdInput').value = last;
-
-    applyLang();
-    showPage('page-password');
-  </script>
+// --- add group ---
+btnAddGroup.onclick=()=>{
+  const g=newGroupName.value.trim(); if(!g) return; if(!store.groups[g]) store.groups[g]={items:[]};
+  const opt=document.createElement('option'); opt.value=g; opt.textContent=g; groupSelect.appendChild(opt); newGroupName.value='';
+};
+</script>
 </body>
 </html>
