@@ -117,6 +117,11 @@ window.onload = checkPassword;
   </section>
 
   <!-- CHECK page -->
+  <div style="display:flex;gap:8px;margin-top:12px">
+  <button id="btnBackToReg" class="smallBtn">← Back</button>
+  <button id="btnDeleteAllCheck" class="btn-danger" style="flex:1">すべて削除</button>
+</div>
+
   <section id="page-check" class="card hidden">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div><strong id="checkTitle">チェック</strong><div class="muted" id="checkHint">Type 7-digit number to auto-match</div></div>
@@ -257,6 +262,19 @@ btnCheckAll.addEventListener('click', ()=>{
 $('#btnToCheck').addEventListener('click', ()=>{ saveUserStore(); currentFilter='All'; renderPendingDone('All'); showPage('check'); });
 $('#btnBackToReg').addEventListener('click', ()=>{ showPage('reg'); });
 $('#btnLogout').addEventListener('click', ()=>{ currentUser=null; store={groups:{}}; itemsBuffer=[]; showPage('user'); });
+  const btnDeleteAllCheck = document.getElementById('btnDeleteAllCheck');
+
+btnDeleteAllCheck.addEventListener('click', ()=>{
+  if(!confirm('番号一覧をすべて削除しますか？ この操作は元に戻せません。')) return;
+  // すべてのグループのアイテムを空にする
+  for(const g in store.groups){
+    store.groups[g].items = [];
+  }
+  saveUserStore();
+  renderPendingDone(currentFilter);
+  showToast('番号一覧をすべて削除しました');
+});
+
 
 // ---- page control ----
 function showPage(p){
@@ -278,3 +296,4 @@ langToggle.addEventListener('click', ()=>{ lang = (lang==='ja'?'en':'ja'); local
 </script>
 </body>
 </html>
+
