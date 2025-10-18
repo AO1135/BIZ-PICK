@@ -117,15 +117,15 @@ window.onload = checkPassword;
   </section>
 
   <!-- CHECK page -->
-  <div style="display:flex;gap:8px;margin-top:12px">
-  <button id="btnBackToReg" class="smallBtn">← Back</button>
-  <button id="btnDeleteAllCheck" class="btn-danger" style="flex:1">すべて削除</button>
-</div>
-
   <section id="page-check" class="card hidden">
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong id="checkTitle">チェック</strong><div class="muted" id="checkHint">Type 7-digit number to auto-match</div></div>
-      <div><button id="btnBackToReg" class="smallBtn">← Back</button></div>
+      <div>
+        <strong id="checkTitle">チェック</strong>
+        <div class="muted" id="checkHint">Type 7-digit number to auto-match</div>
+      </div>
+      <div>
+        <button id="btnBackToRegCheck" class="smallBtn">← Back</button>
+      </div>
     </div>
 
     <div style="margin-top:12px">
@@ -147,19 +147,23 @@ window.onload = checkPassword;
       <h4 id="doneLabel" style="margin-top:12px">Checked</h4>
       <div id="doneArea"></div>
     </div>
+
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button id="btnDeleteAllCheck" class="btn-danger" style="flex:1">すべて削除</button>
+    </div>
   </section>
 </div>
 
 <div id="toast"></div>
 
 <script>
-// ----------------- 既存のコードはほぼそのまま -----------------
 const PREFIX = 'BIZPICK_CL_v3_';
 let currentUser = null;
 let store = { groups: {} };
 let itemsBuffer = [];
 let lang = localStorage.getItem(PREFIX + 'lang') || 'ja';
 const $ = s => document.querySelector(s);
+
 const pageUser = $('#page-user'), pageReg = $('#page-reg'), pageCheck = $('#page-check');
 const userNameInput = $('#userName'), btnStart = $('#btnStart'), btnClearUser = $('#btnClearUser');
 const langToggle = $('#langToggle');
@@ -168,21 +172,22 @@ const imgInput = $('#imgInput'), btnRecognize = $('#btnRecognize'), preprocessTo
 const btnResetDetected = $('#btnResetDetected'), manualNum = $('#manualNum'), btnAddManual = $('#btnAddManual');
 const listArea = $('#listArea'), btnAssignGroups = $('#btnAssignGroups'), btnBulkGroup = $('#btnBulkGroup');
 const btnToCheck = $('#btnToCheck'), btnLogout = $('#btnLogout');
-const btnBackToReg = $('#btnBackToReg'), checkInput = $('#checkInput'), pendingArea = $('#pendingArea'), doneArea = $('#doneArea'), stats = $('#stats');
+const btnBackToRegCheck = $('#btnBackToRegCheck'), checkInput = $('#checkInput'), pendingArea = $('#pendingArea'), doneArea = $('#doneArea'), stats = $('#stats');
 const filterBar = $('#filterBar'), toast = $('#toast');
-const instr = $('#instr'), detHeader = $('#detHeader'), listTitle = $('#listTitle');
+const instr = $('#instr'), listTitle = $('#listTitle');
 const btnCheckAll = $('#btnCheckAll');
+const btnDeleteAllCheck = $('#btnDeleteAllCheck');
 
-// --- helper ---
+let currentFilter = 'All';
+
+// helper
 function showToast(msg, ms=900){ toast.textContent = msg; toast.style.display='block'; setTimeout(()=>toast.style.display='none', ms); }
 function saveUserStore(){ if(!currentUser) return; localStorage.setItem(PREFIX + currentUser, JSON.stringify(store)); localStorage.setItem(PREFIX + 'lang', lang); }
 function loadUserStore(user){ const raw = localStorage.getItem(PREFIX + user); if(raw){ try{ store = JSON.parse(raw); } catch(e){ store = { groups: {} }; } } else { store = { groups: {} }; } }
 function existsAny(num){ for(const g in store.groups){ if((store.groups[g].items||[]).find(i=>i.num===num)) return true; } return false; }
 function copyText(txt){ if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).catch(()=>prompt('Copy:', txt)); else prompt('Copy:', txt); }
 
-let currentFilter = 'All';
-
-// ---- render pending/done ----
+// render pending/done
 function renderPendingDone(filterGroup='All'){
   pendingArea.innerHTML = ''; doneArea.innerHTML = ''; stats.textContent = ''; filterBar.innerHTML='';
   const groupNames = ['All', ...Object.keys(store.groups || {})];
@@ -228,10 +233,10 @@ function renderPendingDone(filterGroup='All'){
   stats.textContent = `Pending: ${pendingCount} (${pendingQty})  ／  Done: ${doneCount} (${doneQty})`;
 }
 
-// ---- find item ----
+// find item
 function findItemAcross(num){ for(const g in store.groups){ const it = (store.groups[g].items||[]).find(x=>x.num===num); if(it) return { group:g, item: it }; } return null; }
 
-// ---- check logic ----
+// check logic
 function doCheckNumber(num, quickQty=null){
   const found = findItemAcross(num); if(!found) return;
   const it = found.item;
@@ -242,13 +247,13 @@ function doCheckNumber(num, quickQty=null){
   saveUserStore(); renderPendingDone(currentFilter);
 }
 
-// ---- auto-match input ----
+// auto-match input
 checkInput.addEventListener('input', (e)=>{
   const v = (e.target.value||'').trim();
   if(/^\d{7}$/.test(v)){ doCheckNumber(v); e.target.value=''; }
 });
 
-// ---- check all button ----
+// check all
 btnCheckAll.addEventListener('click', ()=>{
   if(!confirm('このグループ内の全アイテムをチェック済みにしますか？')) return;
   for(const g in store.groups){
@@ -258,25 +263,20 @@ btnCheckAll.addEventListener('click', ()=>{
   saveUserStore(); renderPendingDone(currentFilter); showToast('All items checked');
 });
 
-// ---- navigation buttons ----
-$('#btnToCheck').addEventListener('click', ()=>{ saveUserStore(); currentFilter='All'; renderPendingDone('All'); showPage('check'); });
-$('#btnBackToReg').addEventListener('click', ()=>{ showPage('reg'); });
-$('#btnLogout').addEventListener('click', ()=>{ currentUser=null; store={groups:{}}; itemsBuffer=[]; showPage('user'); });
-  const btnDeleteAllCheck = document.getElementById('btnDeleteAllCheck');
+// navigation
+btnToCheck.addEventListener('click', ()=>{ saveUserStore(); currentFilter='All'; renderPendingDone('All'); showPage('check'); });
+btnBackToRegCheck.addEventListener('click', ()=>{ showPage('reg'); });
 
+// delete all
 btnDeleteAllCheck.addEventListener('click', ()=>{
   if(!confirm('番号一覧をすべて削除しますか？ この操作は元に戻せません。')) return;
-  // すべてのグループのアイテムを空にする
-  for(const g in store.groups){
-    store.groups[g].items = [];
-  }
+  for(const g in store.groups){ store.groups[g].items = []; }
   saveUserStore();
   renderPendingDone(currentFilter);
   showToast('番号一覧をすべて削除しました');
 });
 
-
-// ---- page control ----
+// page control
 function showPage(p){
   pageUser.classList.add('hidden'); pageReg.classList.add('hidden'); pageCheck.classList.add('hidden');
   if(p==='user') pageUser.classList.remove('hidden');
@@ -284,16 +284,15 @@ function showPage(p){
   if(p==='check') pageCheck.classList.remove('hidden');
 }
 
-// ---- user login ----
+// login
 btnStart.addEventListener('click', ()=>{
   const name = userNameInput.value.trim(); if(!name){ alert('Enter user name'); return; }
   currentUser = name; loadUserStore(currentUser); showPage('reg'); showToast('Welcome '+currentUser);
 });
 btnClearUser.addEventListener('click', ()=>{ if(confirm('Clear local data for this user?')){ localStorage.removeItem(PREFIX+userNameInput.value); showToast('Cleared'); }});
 
-// ---- language toggle ----
+// language toggle
 langToggle.addEventListener('click', ()=>{ lang = (lang==='ja'?'en':'ja'); localStorage.setItem(PREFIX+'lang', lang); showToast('Lang: '+lang); });
 </script>
 </body>
 </html>
-
