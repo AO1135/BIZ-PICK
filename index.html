@@ -120,7 +120,6 @@ button{height:44px;border-radius:10px;border:none;padding:0 14px;cursor:pointer}
       <div id="doneArea"></div>
     </div>
   </section>
-
 </div>
 
 <div id="toast"></div>
@@ -135,16 +134,16 @@ function checkPassword(){
 }
 window.onload = checkPassword;
 
-// ==== BIZ.PICK.CL 完全版 ====
+// ==== BIZ.PICK.CL 完全版（個数対応）====
 const PREFIX = 'BIZPICK_CL_v5_';
 let currentUser=null, store={groups:{},items:[]}, itemsBuffer=[];
 
 // ---- DOM
 const $ = s=>document.querySelector(s);
 const pageUser = $('#page-user'), pageReg = $('#page-reg'), pageCheck = $('#page-check');
-const userNameInput = $('#userName'), btnStart = $('#btnStart'), btnClearUser = $('#btnClearUser');
+const userNameInput = $('#userName'), btnStart = $('#btnStart'), btnClearUser =$('#btnClearUser');
 const groupSelect = $('#groupSelect'), newGroupName = $('#newGroupName'), btnAddGroup = $('#btnAddGroup');
-const imgInput = $('#imgInput'), btnRecognize = $('#btnRecognize'), preprocessToggle = $('#preprocessToggle');
+const imgInput = $('#imgInput'), btnRecognize = $('#btnRecognize');
 const btnResetDetected = $('#btnResetDetected'), manualNum = $('#manualNum'), btnAddManual = $('#btnAddManual');
 const listArea = $('#listArea'), btnAssignGroups = $('#btnAssignGroups'), btnBulkGroup = $('#btnBulkGroup');
 const btnToCheck = $('#btnToCheck'), btnLogout = $('#btnLogout');
@@ -169,8 +168,20 @@ btnStart.onclick=()=>{
 btnClearUser.onclick=()=>{ userNameInput.value=''; currentUser=null; };
 
 // ==== グループ管理 ====
-function refreshGroupSelect(){ groupSelect.innerHTML=''; Object.keys(store.groups).forEach(g=>{ let o=document.createElement('option'); o.value=g; o.innerText=g; groupSelect.appendChild(o); }); }
-btnAddGroup.onclick=()=>{ let n=newGroupName.value.trim(); if(!n) return; if(!store.groups[n]) store.groups[n]=[]; newGroupName.value=''; refreshGroupSelect(); saveUserStore(); };
+function refreshGroupSelect(){
+  groupSelect.innerHTML='';
+  Object.keys(store.groups).forEach(g=>{
+    let o=document.createElement('option');
+    o.value=g; o.innerText=g;
+    groupSelect.appendChild(o);
+  });
+}
+btnAddGroup.onclick=()=>{
+  let n=newGroupName.value.trim();
+  if(!n) return;
+  if(!store.groups[n]) store.groups[n]=[];
+  newGroupName.value=''; refreshGroupSelect(); saveUserStore();
+};
 
 // ==== OCR ====
 btnRecognize.onclick=async()=>{
@@ -182,7 +193,11 @@ btnRecognize.onclick=async()=>{
     const res=await Tesseract.recognize(imgData,'eng',{logger:m=>{}});
     let txt=res.data.text.replace(/[^\d]/g,' ');
     let nums=(txt.match(/\b\d{7}\b/g)||[]);
-    nums.forEach(n=>{ if(!store.items.find(i=>i.num===n)) store.items.push({num:n,group:null,done:false}); });
+    nums.forEach(n=>{
+      if(!store.items.find(i=>i.num===n)){
+        store.items.push({num:n,group:null,done:false,qty:0});
+      }
+    });
     refreshListArea(); saveUserStore(); toastMsg('OCR完了');
   };
   reader.readAsDataURL(file);
@@ -190,30 +205,50 @@ btnRecognize.onclick=async()=>{
 
 // ==== 手動追加 ====
 btnAddManual.onclick=()=>{
-  const n=manualNum.value.trim(); if(!/^\d{7}$/.test(n)){ toastMsg('7桁番号を入力'); return; }
+  const n=manualNum.value.trim();
+  if(!/^\d{7}$/.test(n)){ toastMsg('7桁番号を入力'); return; }
   if(store.items.find(i=>i.num===n)){ toastMsg('重複番号'); return; }
-  store.items.push({num:n,group:null,done:false}); manualNum.value=''; refreshListArea(); saveUserStore();
+  store.items.push({num:n,group:null,done:false,qty:0});
+  manualNum.value=''; refreshListArea(); saveUserStore();
 };
 btnResetDetected.onclick=()=>{ store.items=[]; refreshListArea(); saveUserStore(); };
 
-// ==== リスト表示 ====
+// ==== リスト表示（個数入力付き）====
 function refreshListArea(){
   listArea.innerHTML='';
   store.items.forEach((i,idx)=>{
     const row=document.createElement('div'); row.className='itemRow';
+
     const chk=document.createElement('input'); chk.type='checkbox'; chk.dataset.idx=idx;
     row.appendChild(chk);
-    const span=document.createElement('span'); span.className='num'; span.innerText=i.num; row.appendChild(span);
-    const grp=document.createElement('span'); grp.className='groupTag'; grp.innerText=i.group||'-'; row.appendChild(grp);
+
+    const span=document.createElement('span'); span.className='num'; span.innerText=i.num;
+    row.appendChild(span);
+
+    const grp=document.createElement('span'); grp.className='groupTag'; grp.innerText=i.group||'-';
+    row.appendChild(grp);
+
+    const qty=document.createElement('input');
+    qty.type='number';
+    qty.min='0';
+    qty.value=i.qty || '';
+    qty.className='qtyInput';
+    qty.onchange=()=>{ store.items[idx].qty=parseInt(qty.value)||0; saveUserStore(); };
+    row.appendChild(qty);
+
     listArea.appendChild(row);
   });
 }
 
 // ==== 一括グループ割り当て ====
 btnBulkGroup.onclick=()=>{
-  const sel=groupSelect.value; if(!sel){ toastMsg('グループ選択'); return; }
+  const sel=groupSelect.value;
+  if(!sel){ toastMsg('グループ選択'); return; }
   listArea.querySelectorAll('input[type=checkbox]').forEach(chk=>{
-    if(chk.checked){ store.items[chk.dataset.idx].group=sel; chk.checked=false; }
+    if(chk.checked){
+      store.items[chk.dataset.idx].group=sel;
+      chk.checked=false;
+    }
   });
   refreshListArea(); saveUserStore();
 };
@@ -234,14 +269,21 @@ checkInput.oninput=()=>{
   checkInput.value='';
 };
 
-// チェックエリア表示
+// チェックエリア表示（個数表示付き）
 function refreshCheckArea(){
   pendingArea.innerHTML=''; doneArea.innerHTML='';
   let p=0,d=0;
   store.items.forEach(i=>{
     const div=document.createElement('div'); div.className='itemRow';
-    const span=document.createElement('span'); span.className='num'; span.innerText=i.num; div.appendChild(span);
-    const grp=document.createElement('span'); grp.className='groupTag'; grp.innerText=i.group||'-'; div.appendChild(grp);
+    const span=document.createElement('span'); span.className='num'; span.innerText=i.num;
+    div.appendChild(span);
+
+    const grp=document.createElement('span'); grp.className='groupTag'; grp.innerText=i.group||'-';
+    div.appendChild(grp);
+
+    const qty=document.createElement('span'); qty.className='groupTag'; qty.innerText='Qty: ' + (i.qty || 0);
+    div.appendChild(qty);
+
     if(i.done){ doneArea.appendChild(div); d++; } else { pendingArea.appendChild(div); p++; }
   });
   stats.innerText=`Pending: ${p}, Checked: ${d}`;
@@ -249,7 +291,6 @@ function refreshCheckArea(){
 
 // ==== Logout ====
 btnLogout.onclick=()=>{ currentUser=null; pageReg.classList.add('hidden'); pageUser.classList.remove('hidden'); };
-
 </script>
 </body>
 </html>
