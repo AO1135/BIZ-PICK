@@ -39,145 +39,217 @@ button{height:44px;border-radius:10px;border:none;padding:0 14px;cursor:pointer}
 </head>
 <body>
 
-<script>
-/* ==== パスワード認証 ==== */
-const PASSWORD = "0509";
-function checkPassword() {
-  const userInput = prompt("🔐 パスコードを入力してください:");
-  if (userInput !== PASSWORD) {
-    alert("❌ パスワードが違います");
-    location.reload();
-  }
-}
-window.onload = checkPassword;
-</script>
-
 <div class="wrap">
+  <header>
+    <h1 id="appTitle">BIZ.PICK.CL</h1>
+  </header>
 
-<header>
-  <h1 id="appTitle">BIZ.PICK.CL</h1>
-  <div style="display:flex;gap:8px;align-items:center">
-    <button id="langToggle" class="langBtn">English</button>
-  </div>
-</header>
-
-<!-- ユーザー入力 -->
-<section id="page-user" class="card">
-  <div><strong id="lblUser">ユーザー</strong></div>
-  <input id="userName" type="text" placeholder="ユーザー名を入力（例：A01）" autocomplete="off">
-  <div style="display:flex;gap:8px;margin-top:8px">
-    <button id="btnStart" class="btn-primary" style="flex:1">Start</button>
-    <button id="btnClearUser" class="btn-danger" style="width:110px">Clear</button>
-  </div>
-  <div class="muted" style="margin-top:10px">※ 各ユーザーはこの端末上に独立して保存されます</div>
-</section>
-
-<!-- OCR / 登録 / グループ -->
-<section id="page-reg" class="card hidden">
-  <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-    <select id="groupSelect" style="flex:1"></select>
-    <input id="newGroupName" type="text" placeholder="New group name">
-    <button id="btnAddGroup" class="smallBtn">Add</button>
-  </div>
-
-  <div id="instr" class="muted">1) カメラで撮影または画像を選択（7桁を検出）</div>
-  <input id="imgInput" type="file" accept="image/*" capture="environment">
-
-  <div style="display:flex;gap:8px;margin-top:10px">
-    <button id="btnRecognize" class="btn-primary" style="flex:1">OCR実行</button>
-    <button id="btnResetDetected" class="btn-danger" style="width:110px">Reset</button>
-  </div>
-
-  <div style="margin-top:12px">
-    <div class="muted">または手入力で追加</div>
+  <!-- USER LOGIN -->
+  <section id="page-user" class="card">
+    <div><strong id="lblUser">ユーザー</strong></div>
+    <input id="userName" type="text" placeholder="ユーザー名を入力（例：A01）" autocomplete="off">
     <div style="display:flex;gap:8px;margin-top:8px">
-      <input id="manualNum" type="text" placeholder="7桁番号を入力">
-      <button id="btnAddManual" class="smallBtn">追加</button>
+      <button id="btnStart" class="btn-primary" style="flex:1">Start</button>
+      <button id="btnClearUser" class="btn-danger" style="width:110px">Clear</button>
     </div>
-  </div>
+    <div class="muted" style="margin-top:10px">※ 各ユーザーはこの端末上に独立して保存されます</div>
+  </section>
 
-  <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-    <label style="display:flex;align-items:center;gap:8px">
-      <input id="preprocessToggle" type="checkbox"> 画像補正（白黒・閾値）
-    </label>
-    <div class="muted" style="margin-left:auto">※ 補正は多少重いです</div>
-  </div>
+  <!-- REGISTRATION / OCR / LIST / GROUP-ASSIGN -->
+  <section id="page-reg" class="card hidden">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <select id="groupSelect" style="flex:1"></select>
+      <input id="newGroupName" type="text" placeholder="New group name">
+      <button id="btnAddGroup" class="smallBtn">Add</button>
+    </div>
 
-  <hr>
+    <div id="instr" class="muted">1) カメラで撮影または画像を選択（7桁を検出）</div>
+    <input id="imgInput" type="file" accept="image/*" capture="environment">
 
-  <div>
-    <h3 id="listTitle">番号一覧（必要数を入力 → グループを設定）</h3>
-    <div id="listArea" class="card" style="padding:10px;max-height:320px;overflow:auto"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button id="btnRecognize" class="btn-primary" style="flex:1">OCR実行</button>
+      <button id="btnResetDetected" class="btn-danger" style="width:110px">Reset</button>
+    </div>
+
+    <div style="margin-top:12px">
+      <div class="muted">または手入力で追加</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input id="manualNum" type="text" placeholder="7桁番号を入力">
+        <button id="btnAddManual" class="smallBtn">追加</button>
+      </div>
+    </div>
+
+    <hr>
+
+    <div>
+      <h3 id="listTitle">番号一覧（必要数を入力 → グループを設定）</h3>
+      <div id="listArea" class="card" style="padding:10px;max-height:320px;overflow:auto"></div>
+
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button id="btnAssignGroups" class="btn-accent" style="flex:1">グループを確定して保存</button>
+        <button id="btnBulkGroup" class="smallBtn">選択を一括でグループ化</button>
+      </div>
+    </div>
 
     <div style="display:flex;gap:8px;margin-top:12px">
-      <button id="btnAssignGroups" class="btn-accent" style="flex:1">グループを確定して保存</button>
-      <button id="btnBulkGroup" class="smallBtn">選択を一括でグループ化</button>
+      <button id="btnToCheck" class="btn-accent" style="flex:1">チェック画面へ</button>
+      <button id="btnLogout" class="smallBtn">Logout</button>
     </div>
-  </div>
+  </section>
 
-  <div style="display:flex;gap:8px;margin-top:12px">
-    <button id="btnToCheck" class="btn-accent" style="flex:1">チェック画面へ</button>
-    <button id="btnLogout" class="smallBtn">Logout</button>
-  </div>
-</section>
+  <!-- CHECK page -->
+  <section id="page-check" class="card hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong id="checkTitle">チェック</strong></div>
+      <div><button id="btnBackToReg" class="smallBtn">← Back</button></div>
+    </div>
 
-<!-- チェック画面 -->
-<section id="page-check" class="card hidden">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong id="checkTitle">チェック</strong><div class="muted" id="checkHint">Type 7-digit number to auto-match</div></div>
-    <div><button id="btnBackToReg" class="smallBtn">← Back</button></div>
-  </div>
+    <div style="margin-top:12px">
+      <input id="checkInput" type="text" placeholder="Enter 7-digit number" inputmode="numeric" pattern="[0-9]*">
+      <div style="margin-top:8px" class="muted">Tip: 7桁を入力すると自動で判定します</div>
+    </div>
 
-  <div style="margin-top:12px">
-    <input id="checkInput" type="text" placeholder="Enter 7-digit number" inputmode="numeric" pattern="[0-9]*">
-    <div style="margin-top:8px" class="muted">Tip: 7桁を入力すると自動で判定します</div>
-  </div>
+    <div style="margin-top:12px">
+      <div id="stats" class="muted"></div>
+      <div class="filterBar" id="filterBar"></div>
 
-  <div style="margin-top:12px">
-    <div id="stats" class="muted"></div>
-    <div class="filterBar" id="filterBar"></div>
+      <h4 id="pendingLabel">Pending</h4>
+      <div id="pendingArea" style="min-height:80px"></div>
 
-    <h4 id="pendingLabel">Pending</h4>
-    <div id="pendingArea" style="min-height:80px"></div>
-
-    <h4 id="doneLabel" style="margin-top:12px">Checked</h4>
-    <div id="doneArea"></div>
-  </div>
-</section>
+      <h4 id="doneLabel" style="margin-top:12px">Checked</h4>
+      <div id="doneArea"></div>
+    </div>
+  </section>
 
 </div>
 
 <div id="toast"></div>
 
 <script>
-// ==== ここから下は前回のOCR/グループ/チェック処理スクリプト ====
-/* 全コードは先ほどまでのBIZ.PICK.CL完全版のスクリプトをそのまま統合 */
+// ==== パスワード認証 ====
+const PASSWORD = "0509";
+function checkPassword(){
+  const userInput = prompt("🔐 パスコードを入力してください:");
+  if(userInput !== PASSWORD){ alert("❌ パスワードが違います"); location.reload(); }
+  else { alert("✅ ログイン成功"); }
+}
+window.onload = checkPassword;
 
-const PREFIX = 'BIZPICK_CL_v3_';
-let currentUser = null;
-let store = { groups: {} };
-let itemsBuffer = [];
-let lang = localStorage.getItem(PREFIX + 'lang') || 'ja';
+// ==== BIZ.PICK.CL 完全版 ====
+const PREFIX = 'BIZPICK_CL_v5_';
+let currentUser=null, store={groups:{},items:[]}, itemsBuffer=[];
 
-// DOM shortcuts
-const $ = s => document.querySelector(s);
+// ---- DOM
+const $ = s=>document.querySelector(s);
 const pageUser = $('#page-user'), pageReg = $('#page-reg'), pageCheck = $('#page-check');
 const userNameInput = $('#userName'), btnStart = $('#btnStart'), btnClearUser = $('#btnClearUser');
-const langToggle = $('#langToggle');
 const groupSelect = $('#groupSelect'), newGroupName = $('#newGroupName'), btnAddGroup = $('#btnAddGroup');
 const imgInput = $('#imgInput'), btnRecognize = $('#btnRecognize'), preprocessToggle = $('#preprocessToggle');
 const btnResetDetected = $('#btnResetDetected'), manualNum = $('#manualNum'), btnAddManual = $('#btnAddManual');
 const listArea = $('#listArea'), btnAssignGroups = $('#btnAssignGroups'), btnBulkGroup = $('#btnBulkGroup');
 const btnToCheck = $('#btnToCheck'), btnLogout = $('#btnLogout');
-const btnBackToReg = $('#btnBackToReg'), checkInput = $('#checkInput'), pendingArea = $('#pendingArea'), doneArea = $('#doneArea'), stats = $('#stats');
-const filterBar = $('#filterBar'), toast = $('#toast');
-const instr = $('#instr'), detHeader = $('#detHeader'), listTitle = $('#listTitle');
+const btnBackToReg = $('#btnBackToReg'), checkInput = $('#checkInput');
+const pendingArea = $('#pendingArea'), doneArea = $('#doneArea'), stats = $('#stats');
+const toast = $('#toast');
 
-/* ---- ここに前回の完全版スクリプトをすべて貼る ---- */
+// ---- toast
+function toastMsg(msg,t=1500){ toast.innerText=msg; toast.style.display='block'; setTimeout(()=>toast.style.display='none',t); }
 
-// 省略している部分はすでに提供した完全版スクリプトそのまま適用
+// ---- storage
+function saveUserStore(){ if(currentUser) localStorage.setItem(PREFIX+currentUser,JSON.stringify(store)); }
+function loadUserStore(user){ currentUser=user; let data=localStorage.getItem(PREFIX+user); if(data) store=JSON.parse(data); else store={groups:{},items:[]}; }
+
+// ==== ユーザー操作 ====
+btnStart.onclick=()=>{
+  const name=userNameInput.value.trim(); if(!name){ toastMsg('ユーザー名を入力'); return; }
+  loadUserStore(name);
+  pageUser.classList.add('hidden'); pageReg.classList.remove('hidden');
+  refreshGroupSelect(); refreshListArea();
+};
+btnClearUser.onclick=()=>{ userNameInput.value=''; currentUser=null; };
+
+// ==== グループ管理 ====
+function refreshGroupSelect(){ groupSelect.innerHTML=''; Object.keys(store.groups).forEach(g=>{ let o=document.createElement('option'); o.value=g; o.innerText=g; groupSelect.appendChild(o); }); }
+btnAddGroup.onclick=()=>{ let n=newGroupName.value.trim(); if(!n) return; if(!store.groups[n]) store.groups[n]=[]; newGroupName.value=''; refreshGroupSelect(); saveUserStore(); };
+
+// ==== OCR ====
+btnRecognize.onclick=async()=>{
+  if(!imgInput.files.length){ toastMsg('画像を選択してください'); return; }
+  const file=imgInput.files[0];
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    let imgData=e.target.result;
+    const res=await Tesseract.recognize(imgData,'eng',{logger:m=>{}});
+    let txt=res.data.text.replace(/[^\d]/g,' ');
+    let nums=(txt.match(/\b\d{7}\b/g)||[]);
+    nums.forEach(n=>{ if(!store.items.find(i=>i.num===n)) store.items.push({num:n,group:null,done:false}); });
+    refreshListArea(); saveUserStore(); toastMsg('OCR完了');
+  };
+  reader.readAsDataURL(file);
+};
+
+// ==== 手動追加 ====
+btnAddManual.onclick=()=>{
+  const n=manualNum.value.trim(); if(!/^\d{7}$/.test(n)){ toastMsg('7桁番号を入力'); return; }
+  if(store.items.find(i=>i.num===n)){ toastMsg('重複番号'); return; }
+  store.items.push({num:n,group:null,done:false}); manualNum.value=''; refreshListArea(); saveUserStore();
+};
+btnResetDetected.onclick=()=>{ store.items=[]; refreshListArea(); saveUserStore(); };
+
+// ==== リスト表示 ====
+function refreshListArea(){
+  listArea.innerHTML='';
+  store.items.forEach((i,idx)=>{
+    const row=document.createElement('div'); row.className='itemRow';
+    const chk=document.createElement('input'); chk.type='checkbox'; chk.dataset.idx=idx;
+    row.appendChild(chk);
+    const span=document.createElement('span'); span.className='num'; span.innerText=i.num; row.appendChild(span);
+    const grp=document.createElement('span'); grp.className='groupTag'; grp.innerText=i.group||'-'; row.appendChild(grp);
+    listArea.appendChild(row);
+  });
+}
+
+// ==== 一括グループ割り当て ====
+btnBulkGroup.onclick=()=>{
+  const sel=groupSelect.value; if(!sel){ toastMsg('グループ選択'); return; }
+  listArea.querySelectorAll('input[type=checkbox]').forEach(chk=>{
+    if(chk.checked){ store.items[chk.dataset.idx].group=sel; chk.checked=false; }
+  });
+  refreshListArea(); saveUserStore();
+};
+
+// ==== グループ確定 ====
+btnAssignGroups.onclick=()=>{ saveUserStore(); toastMsg('保存しました'); };
+
+// ==== チェック画面 ====
+btnToCheck.onclick=()=>{ pageReg.classList.add('hidden'); pageCheck.classList.remove('hidden'); refreshCheckArea(); };
+btnBackToReg.onclick=()=>{ pageCheck.classList.add('hidden'); pageReg.classList.remove('hidden'); };
+
+// チェック入力
+checkInput.oninput=()=>{
+  const val=checkInput.value.trim();
+  if(val.length!==7) return;
+  let it=store.items.find(i=>i.num===val);
+  if(it && !it.done){ it.done=true; refreshCheckArea(); saveUserStore(); }
+  checkInput.value='';
+};
+
+// チェックエリア表示
+function refreshCheckArea(){
+  pendingArea.innerHTML=''; doneArea.innerHTML='';
+  let p=0,d=0;
+  store.items.forEach(i=>{
+    const div=document.createElement('div'); div.className='itemRow';
+    const span=document.createElement('span'); span.className='num'; span.innerText=i.num; div.appendChild(span);
+    const grp=document.createElement('span'); grp.className='groupTag'; grp.innerText=i.group||'-'; div.appendChild(grp);
+    if(i.done){ doneArea.appendChild(div); d++; } else { pendingArea.appendChild(div); p++; }
+  });
+  stats.innerText=`Pending: ${p}, Checked: ${d}`;
+}
+
+// ==== Logout ====
+btnLogout.onclick=()=>{ currentUser=null; pageReg.classList.add('hidden'); pageUser.classList.remove('hidden'); };
 
 </script>
-
 </body>
 </html>
