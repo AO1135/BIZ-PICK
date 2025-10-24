@@ -251,31 +251,32 @@
     .code-clickable:hover {
       color: #2980b9;
       text-decoration: underline;
-    }
-    .copy-btn {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 18px;
-      padding: 4px 8px;
-      min-height: auto;
-      min-width: auto;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .copy-btn:hover {
-      background: #f0f8ff;
-      transform: scale(1.1);
-    }
-    .copy-btn:active {
-      transform: scale(0.95);
-    }
-    .copy-btn.copied {
-      color: #27ae60;
-    }
-
+    }.copy-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 8px 12px;  /* 修正: 4px 8px → 8px 12px */
+  min-height: 44px;   /* 修正: auto → 44px */
+  min-width: 44px;    /* 修正: auto → 44px */
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: rgba(52, 152, 219, 0.2);  /* 追加 */
+  touch-action: manipulation;  /* 追加 */
+}
+.copy-btn:hover {
+  background: #f0f8ff;
+  transform: scale(1.1);
+}
+.copy-btn:active {
+  transform: scale(0.95);
+  background: #e3f2fd;  /* 追加: タップ時の視覚的フィードバック */
+}
+.copy-btn.copied {
+  color: #27ae60;
+}
     .code-with-copy {
       display: inline-flex;
       align-items: center;
@@ -836,30 +837,27 @@ document.getElementById('loginSubmit').onclick=()=>{
           <button data-id='${item.id}' class='small-btn removeBtn'>${texts[lang].del}</button>`;
         el.appendChild(div);
       });
-      document.querySelectorAll('#precheckList .copy-btn').forEach(btn => {
-  btn.onclick = (e) => {
+     // 📋 コピーボタンの処理（コピーボタンのみ、画像ボタンは除外）
+document.querySelectorAll('#precheckList .copy-btn:not(.ikea-img-btn)').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
     e.stopPropagation();
-    copyToClipboard(e.target.dataset.code, e.target);
-  };
+    const code = btn.dataset.code;
+    if(code) copyToClipboard(code, btn);
+  }, {passive: false});
 });
 
-// 📷 IKEA画像ボタン押下処理 ← ここを追加！
-      document.querySelectorAll('#precheckList .copy-btn').forEach(btn => {
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          copyToClipboard(e.target.dataset.code, e.target);
-        };
-      });
+// 📷 IKEA画像ボタンの処理
+document.querySelectorAll('#precheckList .ikea-img-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const code = btn.dataset.code;
+    if(code) fetchIkeaProductImage(code);
+  }, {passive: false});
+});
 
-      // 📷 IKEA画像ボタン押下処理（チェック前リスト）
-      document.querySelectorAll('#precheckList .ikea-img-btn').forEach(btn => {
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          const code = e.target.dataset.code;
-          fetchIkeaProductImage(code);
-        };
-      });
-    } // ← renderPrecheck() の終わりをここで閉じる！
+
 
     function findItemById(list, id){
       return list.find(item => item.id === id);
@@ -1081,22 +1079,24 @@ document.getElementById('loginSubmit').onclick=()=>{
         createInlineCheckBox(aggregatedItem.code, totalQty, indices, firstIndex, placeholder);
       });
     // 📋 コピーボタンの処理
-      document.querySelectorAll('#checklist .copy-btn:not(.ikea-img-btn)').forEach(btn => {
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          copyToClipboard(e.target.dataset.code, e.target);
-        };
-      });
+document.querySelectorAll('#checklist .copy-btn:not(.ikea-img-btn)').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const code = btn.dataset.code;
+    if(code) copyToClipboard(code, btn);
+  }, {passive: false});
+});
 
-      // 📷 IKEA画像ボタンの処理
-      document.querySelectorAll('#checklist .ikea-img-btn').forEach(btn => {
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          const code = e.target.dataset.code;
-          fetchIkeaProductImage(code);
-        };
-      });
-    }
+// 📷 IKEA画像ボタンの処理
+document.querySelectorAll('#checklist .ikea-img-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const code = btn.dataset.code;
+    if(code) fetchIkeaProductImage(code);
+  }, {passive: false});
+});
 
     function renderChecked(){
       const el=document.getElementById('checkedList'); el.innerHTML='';
@@ -1505,6 +1505,7 @@ const codes=result.data.text.match(/(?:\d[.\s]?){8}/g)||[];
   </script>
 </body>
 </html>
+
 
 
 
