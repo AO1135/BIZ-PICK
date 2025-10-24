@@ -1,0 +1,1504 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Indent — チェックリスト</title>
+  <style>
+    body { 
+      font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif; 
+      margin: 0; 
+      background: #f5f7fa;
+      color: #333; 
+      min-height: 100vh;
+    }
+    header { 
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 12px; 
+      background: #fff;
+      border-bottom: 1px solid #e1e8ed;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      position: sticky; top: 0; z-index: 10;
+    }
+    h1 { 
+      font-size: 16px; 
+      margin: 0; 
+      color: #2c3e50;
+      font-weight: 600;
+    }
+    h2 {
+      color: #2c3e50;
+      font-size: 15px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    main { 
+      padding: 10px; 
+      padding-bottom: 65px;
+    }
+    button, input, select, textarea { 
+      font-size: 14px; 
+      padding: 10px 12px; 
+      border: 1px solid #d1dbe3; 
+      border-radius: 5px; 
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      min-height: 44px;
+    }
+    button { 
+      background: #3498db;
+      color: #fff; 
+      cursor: pointer;
+      font-weight: 500;
+      border: none;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+    input, select {
+      background: #fff;
+      border: 1px solid #d1dbe3;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+    }
+
+    /* ▼ 下部ナビゲーション */
+    nav { 
+      position: fixed; bottom: 0; left: 0; right: 0; display: flex; 
+      background: #fff;
+      border-top: 1px solid #e1e8ed;
+      z-index: 20;
+      box-shadow: 0 -1px 3px rgba(0,0,0,0.05);
+    }
+    nav button { 
+      flex: 1; 
+      border: none; 
+      border-right: 1px solid #e1e8ed;
+      background: #fff;
+      color: #657786; 
+      padding: 12px 5px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.3;
+      min-height: 48px;
+    }
+    nav button.active { 
+      background: #f0f8ff;
+      color: #3498db;
+      font-weight: 600;
+    }
+    nav button:hover {
+      background: #f9fafb;
+    }
+    nav button:last-child { border-right: none; }
+
+    .hidden { display: none; }
+
+    /* ▼ 各リスト行 */
+    .list-item {
+      background: #fff;
+      border: 1px solid #e1e8ed;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .list-item:hover {
+      border-color: #3498db;
+      box-shadow: 0 1px 4px rgba(52, 152, 219, 0.1);
+    }
+
+    .item-left {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+      flex: 1;
+      color: #2c3e50;
+      min-width: 0;
+      gap: 4px;
+    }
+
+    /* ▼ 小ボタン */
+    .small-btn {
+      font-size: 14px;
+      padding: 8px 12px;
+      border-radius: 5px;
+      background: #27ae60;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      min-width: 60px;
+      min-height: 40px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .small-btn:hover { 
+      background: #229954;
+    }
+
+    /* ▼ 入力サイズ調整 */
+    .item-left div {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 4px;
+    }
+    .small-input { 
+      font-size: 13px; 
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #d1dbe3;
+    }
+    .small-input.qty { width: 65px; }
+    .small-input.memo { width: 100px; flex: 1; }
+    .memo, .qty { font-size: 12px; color: #657786; }
+
+    /* ▼ グループヘッダー */
+    .group-header {
+      background: #fff;
+      border: 1px solid #e1e8ed;
+      border-left: 3px solid #3498db;
+      padding: 8px 10px;
+      margin: 10px 0 6px 0;
+      border-radius: 5px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #2c3e50;
+    }
+
+    .group-item {
+      background: #fff;
+      border: 1px solid #e1e8ed;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .group-color {
+      width: 32px;
+      height: 32px;
+      border-radius: 5px;
+      border: 2px solid #e1e8ed;
+      flex-shrink: 0;
+    }
+
+    .small-select {
+      font-size: 13px;
+      padding: 5px 8px;
+      border: 1px solid #d1dbe3;
+      border-radius: 4px;
+      background: #fff;
+    }
+
+    /* ▼ インライン数量指定ボックス */
+    .inline-check-box {
+      background: #fff9e6;
+      border: 1px solid #f39c12;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 6px 0;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 13px;
+    }
+
+    .inline-check-box input[type="number"] {
+      width: 70px;
+      font-size: 14px;
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #d1dbe3;
+      font-weight: 500;
+    }
+
+    .inline-check-box .small-btn {
+      font-size: 12px;
+      padding: 6px 10px;
+    }
+
+    .inline-check-box button.inline-close {
+      font-size: 12px;
+      padding: 5px 10px;
+      background: #95a5a6;
+    }
+
+    .code-clickable {
+      font-weight: 600;
+      color: #3498db;
+      cursor: pointer;
+    }
+    .code-clickable:hover {
+      color: #2980b9;
+      text-decoration: underline;
+    }
+    .copy-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px 8px;
+      min-height: auto;
+      min-width: auto;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .copy-btn:hover {
+      background: #f0f8ff;
+      transform: scale(1.1);
+    }
+    .copy-btn:active {
+      transform: scale(0.95);
+    }
+    .copy-btn.copied {
+      color: #27ae60;
+    }
+
+    .code-with-copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .code-with-image {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+
+    #langBtn {
+      background: #ecf0f1;
+      color: #2c3e50;
+      border: 1px solid #d1dbe3;
+      font-size: 12px;
+      padding: 6px 10px;
+      font-weight: 500;
+    }
+    #langBtn:hover {
+      background: #dfe6e9;
+    }
+
+    #passwordError {
+      color: #e74c3c;
+      font-weight: 500;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    section {
+      background: #fff;
+      border-radius: 6px;
+      padding: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 8px;
+    }
+
+    /* チェックボックスのスタイル */
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #3498db;
+      flex-shrink: 0;
+      min-width: 20px;
+      min-height: 20px;
+    }
+
+    /* パスワードページ専用 */
+    #page-password input, #page-login input {
+      display: block;
+      width: 100%;
+      margin: 0 0 10px 0;
+    }
+    #page-password button, #page-login button {
+      display: block;
+      width: 100%;
+      margin: 0;
+    }
+
+    /* 入力欄のコンテナ */
+    section > div {
+      margin-bottom: 10px;
+    }
+
+    /* より狭いスペーシング */
+    .group-name-input {
+      font-size: 13px;
+      padding: 5px 8px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <header>
+    <h1 id="title">パスワード入力</h1>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span id="userDisplay" style="display:none;font-size:12px;color:#657786;"></span>
+      <button id="logoutBtn" style="display:none;font-size:12px;padding:6px 10px;background:#e74c3c;">ログアウト</button>
+      <button id="langBtn">日本語 / English</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Password Page -->
+    <section id="page-password">
+      <input id="passwordInput" type="password" placeholder="パスワードを入力" />
+      <button id="passwordSubmit">ログイン</button>
+      <p id="passwordError" style="color:red;display:none">パスワードが違います</p>
+    </section>
+
+    <!-- Login Page -->
+    <section id="page-login" class="hidden">
+      <input id="userIdInput" placeholder="ユーザーIDを入力" />
+      <button id="loginSubmit">ログイン</button>
+    </section>
+
+    <!-- Pre-Check List Page -->
+    <section id="page-precheck" class="hidden">
+      <h2 id="precheckTitle">チェック待ちリスト</h2>
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+        <!-- IKEA画像プレビュー -->
+<div id="ikeaImage" style="margin-top:10px; text-align:center;"></div>
+
+        <input id="productCodeInput" placeholder="7桁のコード" />
+        <input id="productQtyInput" type="number" min="1" value="1" />
+        <input id="productMemoInput" placeholder="メモ" />
+        <button id="addProductBtn">追加</button>
+        <button id="ocrBtn">OCR追加</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;align-items:center;">
+        <button id="selectAllBtn">全選択</button>
+        <button id="deselectAllBtn">全解除</button>
+        <select id="bulkGroupSelect" class="small-select">
+          <option value="">グループを選択</option>
+        </select>
+        <button id="bulkGroupBtn">選択中をグループ化</button>
+      </div>
+      <div id="precheckList"></div>
+      <button id="precheckConfirm">チェックリストへ確定</button>
+      <button id="precheckReset">リセット</button>
+    </section>
+
+    <!-- Checklist Page -->
+    <section id="page-checklist" class="hidden">
+      <h2 id="checklistTitle">チェックリスト</h2>
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+        <input id="searchCodeInput" placeholder="コードを検索" />
+        <button id="searchBtn">検索</button>
+      </div>
+      <div id="checklist"></div>
+      <button id="checklistReset">リセット</button>
+    </section>
+
+    <!-- Checked List Page -->
+    <section id="page-checked" class="hidden">
+      <h2 id="checkedTitle">チェック済みリスト</h2>
+      <div id="checkedList"></div>
+    </section>
+
+    <!-- Groups Page -->
+    <section id="page-groups" class="hidden">
+      <h2 id="groupsTitle">グループ管理</h2>
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+        <input id="groupNameInput" placeholder="グループ名" />
+        <input id="groupColorInput" type="color" value="#1976d2" />
+        <button id="addGroupBtn">グループ追加</button>
+      </div>
+      <div id="groupsList"></div>
+    </section>
+  </main>
+
+  <nav>
+    <button id="navPrecheck">チェック前リスト</button>
+    <button id="navChecklist">チェックリスト</button>
+    <button id="navChecked">チェック済み一覧</button>
+    <button id="navGroups">グループ</button>
+  </nav>
+
+  <script>
+ // 🔹 Firebase設定
+    const firebaseConfig = {
+      apiKey: "AIzaSyDhmLTaC6Sks7sNcDgjPm1my1GBOuS6L2M",
+      authDomain: "biz-pick.firebaseapp.com",
+      databaseURL: "https://biz-pick-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "biz-pick",
+      storageBucket: "biz-pick.firebasestorage.app",
+      messagingSenderId: "170876055783",
+      appId: "1:170876055783:web:67a06678f0fec4fd3bb242",
+      measurementId: "G-47G2K5PRSC"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    
+    const PASSWORD = '0509';
+    let lang = 'ja';
+    // 全リセット機能用の変数
+    let langBtnClickCount = 0;
+    let langBtnClickTimer = null;
+
+    const texts = {
+      ja: {
+        passwordTitle:'パスワード入力',
+        passwordPlaceholder:'パスワードを入力',
+        loginBtn:'ログイン',
+        loginTitle:'ログイン',
+        userIdPlaceholder:'ユーザーIDを入力',
+        logoutBtn:'ログアウト',
+        currentUser:'ログイン中:',
+        precheckTitle:'チェック待ちリスト', 
+        checklistTitle:'チェックリスト', 
+        checkedTitle:'チェック済みリスト',
+        groupsTitle:'グループ管理',
+        wrongPass:'パスワードが違います', 
+        add:'追加', 
+        ocr:'OCR追加', 
+        confirm:'チェックリストへ確定', 
+        reset:'リセット', 
+        del:'削除', 
+        check:'✔',
+        codePlaceholder:'8桁のコード',
+        qtyLabel:'数量',
+        memoPlaceholder:'メモ',
+        searchPlaceholder:'コードを検索',
+        searchBtn:'検索',
+        notFound:'コードが見つかりません',
+        navPrecheck:'チェック前リスト',
+        navChecklist:'チェックリスト',
+        navChecked:'チェック済み一覧',
+        navGroups:'グループ',
+        alertId:'IDを入力してください',
+        alertCode:'8桁のコードを入力してください',
+        confirmAdd:'件のコードを追加しますか？',
+        noCode:'コードが検出されませんでした',
+        confirmReset:'本当にリセットしますか？',
+        confirmChecklistReset:'チェックリストをリセットしますか？',
+        groupNamePlaceholder:'グループ名',
+        addGroup:'グループ追加',
+        editGroup:'編集',
+        noGroup:'グループなし',
+        group:'グループ',
+        alertGroupName:'グループ名を入力してください',
+        confirmDeleteGroup:'このグループを削除しますか？',
+        selectAll:'全選択',
+        deselectAll:'全解除',
+        bulkGroup:'選択中をグループ化',
+        selectGroup:'グループを選択',
+        noItemSelected:'商品が選択されていません',
+        noGroupSelected:'グループが選択されていません',
+        checkQty:'チェック数量',
+        partialCheck:'部分チェック',
+        fullCheck:'全数  ェック',
+        close:'閉じる',
+        foundItem:'見つかりました',
+        qtyRemaining:'残り',
+        invalidQty:'数量が正しくありません',
+        confirmResetAll:'チェック前リスト、チェックリスト、チェック済みリストを全てリセットしますか？この操作は取り消せません'
+      },
+      en: {
+        passwordTitle:'Enter Password',
+        passwordPlaceholder:'Enter password',
+        loginBtn:'Login',
+        loginTitle:'Login',
+        userIdPlaceholder:'Enter User ID',
+        logoutBtn:'Logout',
+        currentUser:'User:',
+        precheckTitle:'Pre-Check List', 
+        checklistTitle:'Checklist', 
+        checkedTitle:'Checked Items',
+        groupsTitle:'Group Management',
+        wrongPass:'Incorrect password', 
+        add:'Add', 
+        ocr:'Add via OCR', 
+        confirm:'Confirm to Checklist', 
+        reset:'Reset', 
+        del:'Delete', 
+        check:'✔',
+        codePlaceholder:'8-digit code',
+        qtyLabel:'Qty',
+        memoPlaceholder:'Memo',
+        searchPlaceholder:'Search code',
+        searchBtn:'Search',
+        notFound:'Code not found',
+        navPrecheck:'Pre-Check',
+        navChecklist:'Checklist',
+        navChecked:'Checked',
+        navGroups:'Groups',
+        alertId:'Please enter ID',
+        alertCode:'Please enter 8-digit code',
+        confirmAdd:' codes found. Add them?',
+        noCode:'No codes detected',
+        confirmReset:'Really reset?',
+        confirmChecklistReset:'Reset checklist?',
+        groupNamePlaceholder:'Group name',
+        addGroup:'Add Group',
+        editGroup:'Edit',
+        noGroup:'No Group',
+        group:'Group',
+        alertGroupName:'Please enter group name',
+        confirmDeleteGroup:'Delete this group?',
+        selectAll:'Select All',
+        deselectAll:'Deselect All',
+        bulkGroup:'Group Selected',
+        selectGroup:'Select Group',
+        noItemSelected:'No items selected',
+        noGroupSelected:'No group selected',
+        checkQty:'Check Qty',
+        partialCheck:'Partial Check',
+        fullCheck:'Full Check',
+        close:'Close',
+        foundItem:'Found',
+        qtyRemaining:'remaining',
+        invalidQty:'Invalid quantity',
+        confirmResetAll:'Reset all Pre-Check, Checklist, and Checked items? This action cannot be undone'
+      }
+    };
+
+    const pages = ['page-precheck','page-checklist','page-checked','page-groups'];
+
+    function showPage(id){
+      pages.forEach(p=>document.getElementById(p).classList.add('hidden'));
+      // パスワードとログインページも非表示
+      document.getElementById('page-password').classList.add('hidden');
+      document.getElementById('page-login').classList.add('hidden');
+      
+      document.getElementById(id).classList.remove('hidden');
+      const key = id.replace('page-', '') + 'Title';
+      document.getElementById('title').textContent = texts[lang][key] || '';
+      document.querySelectorAll('nav button').forEach(btn=>btn.classList.remove('active'));
+      if (id==='page-precheck') document.getElementById('navPrecheck').classList.add('active');
+      if (id==='page-checklist') document.getElementById('navChecklist').classList.add('active');
+      if (id==='page-checked') document.getElementById('navChecked').classList.add('active');
+      if (id==='page-groups') document.getElementById('navGroups').classList.add('active');
+    }
+
+    function applyLang(){
+      document.getElementById('passwordInput').placeholder = texts[lang].passwordPlaceholder;
+      document.getElementById('passwordSubmit').textContent = texts[lang].loginBtn;
+      document.getElementById('passwordError').textContent = texts[lang].wrongPass;
+      document.getElementById('userIdInput').placeholder = texts[lang].userIdPlaceholder;
+      document.getElementById('loginSubmit').textContent = texts[lang].loginBtn;
+      document.getElementById('logoutBtn').textContent = texts[lang].logoutBtn;
+      if(currentUserId) {
+        document.getElementById('userDisplay').textContent = `${texts[lang].currentUser} ${currentUserId}`;
+      }
+      document.getElementById('productCodeInput').placeholder = texts[lang].codePlaceholder;
+      document.getElementById('productMemoInput').placeholder = texts[lang].memoPlaceholder;
+      document.getElementById('addProductBtn').textContent = texts[lang].add;
+      document.getElementById('ocrBtn').textContent = texts[lang].ocr;
+      document.getElementById('precheckConfirm').textContent = texts[lang].confirm;
+      document.getElementById('precheckReset').textContent = texts[lang].reset;
+      document.getElementById('searchCodeInput').placeholder = texts[lang].searchPlaceholder;
+      document.getElementById('searchBtn').textContent = texts[lang].searchBtn;
+      document.getElementById('checklistReset').textContent = texts[lang].reset;
+      document.getElementById('navPrecheck').textContent = texts[lang].navPrecheck;
+      document.getElementById('navChecklist').textContent = texts[lang].navChecklist;
+      document.getElementById('navChecked').textContent = texts[lang].navChecked;
+      document.getElementById('navGroups').textContent = texts[lang].navGroups;
+      document.getElementById('groupNameInput').placeholder = texts[lang].groupNamePlaceholder;
+      document.getElementById('addGroupBtn').textContent = texts[lang].addGroup;
+      document.getElementById('selectAllBtn').textContent = texts[lang].selectAll;
+      document.getElementById('deselectAllBtn').textContent = texts[lang].deselectAll;
+      document.getElementById('bulkGroupBtn').textContent = texts[lang].bulkGroup;
+      // ページタイトルも更新
+      const currentPage = pages.find(p => !document.getElementById(p).classList.contains('hidden'));
+      if(currentPage) {
+        const key = currentPage.replace('page-', '') + 'Title';
+        document.getElementById('title').textContent = texts[lang][key] || '';
+      }
+      // リストを再描画
+      renderPrecheck();
+      renderChecklist();
+      renderChecked();
+      renderGroups();
+      updateBulkGroupSelect();
+    }
+
+     async function copyToClipboard(text, button) {
+      try {
+        await navigator.clipboard.writeText(text);
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '✓';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.innerHTML = originalHTML;
+          button.classList.remove('copied');
+        }, 1500);
+      } catch (err) {
+        console.error('コピーに失敗:', err);
+      }
+    }
+    document.getElementById('langBtn').addEventListener('click',()=>{
+      // クリックカウントをインクリメント
+      langBtnClickCount++;
+
+      // タイマーをクリア
+      if(langBtnClickTimer) {
+        clearTimeout(langBtnClickTimer);
+      }
+
+      // 3秒後にカウントをリセット
+      langBtnClickTimer = setTimeout(() => {
+        langBtnClickCount = 0;
+      }, 3000);
+
+      // 5回クリックされた場合
+      if(langBtnClickCount >= 5) {
+        langBtnClickCount = 0;
+        clearTimeout(langBtnClickTimer);
+
+        // 確認ダイアログ表示
+        if(confirm(texts[lang].confirmResetAll)){
+          resetAllLists();
+        }
+        return;
+      }
+
+      // 通常の言語切り替え処理
+      lang=(lang==='ja')?'en':'ja';
+      applyLang();
+    });
+
+    // Password
+    document.getElementById('passwordSubmit').onclick=()=>{
+      const val=document.getElementById('passwordInput').value;
+      if(val===PASSWORD){ showPage('page-login'); }
+      else{ const err=document.getElementById('passwordError'); err.style.display='block'; setTimeout(()=>err.style.display='none',2000); }
+    };
+
+    // Login
+    let currentUserId = null;
+
+document.getElementById('loginSubmit').onclick=()=>{
+  const id=document.getElementById('userIdInput').value.trim();
+  if(!id) return alert(texts[lang].alertId);
+
+  // 前のユーザーのデータを保存
+  if(currentUserId) {
+    saveData();
+  }
+
+  // データを初期化してから新しいユーザーに切り替え
+  precheckList = [];
+  checklist = [];
+  checkedList = [];
+  groups = [];
+
+  currentUserId = id;
+  localStorage.setItem('indent:user', id);
+  loadUserData(); // 新しいユーザーのデータを読み込み
+
+  // UIを更新してから再描画
+  document.getElementById('userDisplay').textContent = `${texts[lang].currentUser} ${currentUserId}`;
+  document.getElementById('userDisplay').style.display = 'block';
+  document.getElementById('logoutBtn').style.display = 'block';
+  
+  // データを読み込んだ後に画面を再描画
+  renderPrecheck();
+  renderChecklist();
+  renderChecked();
+  renderGroups();
+  updateBulkGroupSelect();
+  
+  showPage('page-precheck');
+};
+
+    document.getElementById('logoutBtn').onclick=()=>{
+      // 🔹 Firebaseリスナーを解除
+      if(currentUserId) {
+        database.ref(`users/${currentUserId}`).off();
+      }
+      
+      localStorage.removeItem('indent:user');
+      currentUserId = null;
+      precheckList = [];
+      checklist = [];
+      checkedList = [];
+      groups = [];
+      document.getElementById('userDisplay').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'none';
+      document.getElementById('userIdInput').value = '';
+      document.getElementById('page-password').classList.remove('hidden');
+      document.getElementById('page-login').classList.add('hidden');
+      pages.forEach(p=>document.getElementById(p).classList.add('hidden'));
+      document.getElementById('title').textContent = texts[lang].passwordTitle;
+    };
+    let precheckList = [];
+    let checklist = [];
+    let checkedList = [];
+    let groups = [];
+
+    function getUserKey(key){
+      return `indent:${currentUserId}:${key}`;
+    }
+
+    // 🔹 Firebaseからデータ読み込み（リアルタイム同期）
+    function loadUserData(){
+      if(!currentUserId) return;
+      
+      const userRef = database.ref(`users/${currentUserId}`);
+      
+      // リアルタイムリスナーを設定
+      userRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if(data) {
+          precheckList = data.precheck || [];
+          checklist = data.checklist || [];
+          checkedList = data.checked || [];
+          groups = data.groups || [];
+          
+          // 画面を更新
+          renderPrecheck();
+          renderChecklist();
+          renderChecked();
+          renderGroups();
+          updateBulkGroupSelect();
+        }
+      });
+    }
+
+    // 🔹 Firebaseにデータ保存
+    function saveData(){
+      if(!currentUserId) return;
+      
+      database.ref(`users/${currentUserId}`).set({
+        precheck: precheckList,
+        checklist: checklist,
+        checked: checkedList,
+        groups: groups,
+        lastUpdated: Date.now()
+      }).catch(error => {
+        console.error('保存エラー:', error);
+      });
+    }
+
+    function resetAllLists(){
+      precheckList = [];
+      checklist = [];
+      checkedList = [];
+      saveData();
+      renderPrecheck();
+      renderChecklist();
+      renderChecked();
+    }
+
+    function renderPrecheck(){
+      const el=document.getElementById('precheckList'); el.innerHTML='';
+      precheckList.forEach((item)=>{
+        const div=document.createElement('div');
+        div.className='list-item';
+        div.dataset.itemId = item.id;
+        let groupOptions = `<option value="">${texts[lang].noGroup}</option>`;
+        groups.forEach(g => {
+          groupOptions += `<option value="${g.id}" ${item.groupId===g.id?'selected':''}>${g.name}</option>`;
+        });
+        div.innerHTML=`
+          <input type="checkbox" class="item-checkbox" data-id="${item.id}" ${item.selected?'checked':''} style="margin-right:8px;">
+          <div class="item-left">
+          <div class="code-with-image">
+  <span>${item.code}</span>
+  <button class="copy-btn" data-code="${item.code}" title="コピー">📋</button>
+  <button class="copy-btn ikea-img-btn" data-code="${item.code}" title="画像表示">📷</button>
+</div>
+
+            <div>
+              ${texts[lang].qtyLabel}: <input type='number' class='small-input qty' data-id='${item.id}' value='${item.qty}' min='1'>
+              <input type='text' class='small-input memo' data-id='${item.id}' value='${item.memo||''}' placeholder='${texts[lang].memoPlaceholder}'>
+            </div>
+            <div>
+              ${texts[lang].group}: <select class='small-select group-select' data-id='${item.id}'>${groupOptions}</select>
+            </div>
+          </div>
+          <button data-id='${item.id}' class='small-btn removeBtn'>${texts[lang].del}</button>`;
+        el.appendChild(div);
+      });
+      document.querySelectorAll('#precheckList .copy-btn').forEach(btn => {
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    copyToClipboard(e.target.dataset.code, e.target);
+  };
+});
+
+// 📷 IKEA画像ボタン押下処理 ← ここを追加！
+      document.querySelectorAll('#precheckList .copy-btn').forEach(btn => {
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          copyToClipboard(e.target.dataset.code, e.target);
+        };
+      });
+
+      // 📷 IKEA画像ボタン押下処理（チェック前リスト）
+      document.querySelectorAll('#precheckList .ikea-img-btn').forEach(btn => {
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          const code = e.target.dataset.code;
+          fetchIkeaProductImage(code);
+        };
+      });
+    } // ← renderPrecheck() の終わりをここで閉じる！
+
+    function findItemById(list, id){
+      return list.find(item => item.id === id);
+    }
+
+   function processPartialCheck(indices, checkQty, totalQty) {
+  if (checkQty <= 0 || checkQty > totalQty) {
+    alert(texts[lang].invalidQty);
+    return false;
+  }
+
+  let remainingCheckQty = checkQty;
+  const sortedIndices = [...indices].sort((a, b) => b - a);
+
+  // チェック処理（数量を分割して移動）
+  for (let i of sortedIndices) {
+    if (remainingCheckQty <= 0) break;
+
+    const item = checklist[i];
+    if (!item) continue;
+
+    if (item.qty <= remainingCheckQty) {
+      checkedList.push({ ...item });
+      remainingCheckQty -= item.qty;
+      checklist.splice(i, 1);
+    } else {
+      checkedList.push({
+        code: item.code,
+        qty: remainingCheckQty,
+        memo: item.memo,
+        groupId: item.groupId
+      });
+      item.qty -= remainingCheckQty;
+      remainingCheckQty = 0;
+    }
+  }
+
+  saveData();
+
+  // ✅ 再描画は一呼吸おいて安全に行う
+  setTimeout(() => {
+    renderChecklist();
+    renderChecked();
+  }, 10);
+
+  return true;
+}
+
+    function createInlineCheckBox(code, totalQty, indices, firstIndex, placeholder, onClose){
+      document.querySelectorAll('[id^="inline-box-"]').forEach(box => box.innerHTML = '');
+
+      const inlineBox = document.createElement('div');
+      inlineBox.className = 'inline-check-box';
+      inlineBox.innerHTML = `
+        <span style="font-weight:bold;">${code} (${texts[lang].qtyRemaining}: ${totalQty})</span>
+        <span>${texts[lang].checkQty}:</span>
+        <input type="number" id="inline-qty-${firstIndex}" min="1" max="${totalQty}" value="${totalQty}" />
+        <button class="small-btn inline-partial-check" data-indices="${indices.join(',')}" style="font-size:14px;padding:6px 10px;">${texts[lang].partialCheck}</button>
+        <button class="inline-close" data-index="${firstIndex}" style="background:#999;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:14px;">${texts[lang].close}</button>
+      `;
+      placeholder.appendChild(inlineBox);
+      placeholder.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      document.querySelector('.inline-partial-check').onclick = () => {
+        const checkQty = Number(document.getElementById(`inline-qty-${firstIndex}`).value);
+        processPartialCheck(indices, checkQty, totalQty);
+      };
+
+      document.querySelector('.inline-close').onclick = () => {
+        placeholder.innerHTML = '';
+        if(onClose) onClose();
+      };
+    }
+
+    function renderChecklist(){
+      const el=document.getElementById('checklist'); el.innerHTML='';
+      
+      // 同じコード+グループの商品を集約
+      const aggregated = {};
+      checklist.forEach((item, i) => {
+        const key = `${item.code}_${item.groupId || 'nogroup'}`;
+        if(aggregated[key]) {
+          aggregated[key].qty += item.qty;
+          aggregated[key].indices.push(i);
+          // メモを統合（Set で重複を防ぐ）
+          if(item.memo) {
+            const memos = aggregated[key].memo ? aggregated[key].memo.split(', ') : [];
+            if(!memos.includes(item.memo)) {
+              memos.push(item.memo);
+              aggregated[key].memo = memos.join(', ');
+            }
+          }
+        } else {
+          aggregated[key] = {
+            code: item.code,
+            qty: item.qty,
+            memo: item.memo || '',
+            groupId: item.groupId,
+            indices: [i]
+          };
+        }
+      });
+      
+      // 集約されたデータをグループ別に分類
+      const groupedItems = {};
+      const noGroupItems = [];
+      
+      Object.values(aggregated).forEach(item => {
+        if (item.groupId) {
+          if (!groupedItems[item.groupId]) {
+            groupedItems[item.groupId] = [];
+          }
+          groupedItems[item.groupId].push(item);
+        } else {
+          noGroupItems.push(item);
+        }
+      });
+      
+      // グループごとに表示
+      groups.forEach(group => {
+        if (groupedItems[group.id] && groupedItems[group.id].length > 0) {
+          const header = document.createElement('div');
+          header.className = 'group-header';
+          header.style.borderLeftColor = group.color;
+          header.textContent = group.name;
+          el.appendChild(header);
+          
+          groupedItems[group.id].forEach(item => {
+            const firstIndex = item.indices[0];
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.id = `checklist-item-${firstIndex}`;
+            div.innerHTML = `
+              <div class="item-left">
+                <span class="code-clickable" data-indices="${item.indices.join(',')}" style="cursor:pointer;text-decoration:underline;">${item.code}</span> ×${item.qty}
+                ${item.memo ? `<span class="memo">${item.memo}</span>` : ''}
+              </div>
+              <button data-indices='${item.indices.join(',')}' class='small-btn checkBtn'>${texts[lang].check}</button>`;
+            el.appendChild(div);
+            
+            // インライン数量指定ボックスを挿入する場所
+            const placeholder = document.createElement('div');
+            placeholder.id = `inline-box-${firstIndex}`;
+            el.appendChild(placeholder);
+          });
+        }
+      });
+      
+      // グループなしの項目を表示
+      if (noGroupItems.length > 0) {
+        const header = document.createElement('div');
+        header.className = 'group-header';
+        header.style.borderLeftColor = '#999';
+        header.textContent = texts[lang].noGroup;
+        el.appendChild(header);
+        
+       noGroupItems.forEach(item => {
+  const firstIndex = item.indices[0];
+  const div = document.createElement('div');
+  div.className = 'list-item';
+  div.id = `checklist-item-${firstIndex}`;
+  div.innerHTML = `
+      <div class="item-left">
+        <div class="code-with-image">
+          <span class="code-clickable" data-indices="${item.indices.join(',')}" style="cursor:pointer;text-decoration:underline;">${item.code}</span>
+          <button class="copy-btn" data-code="${item.code}" title="コピー">📋</button>
+          <button class="copy-btn ikea-img-btn" data-code="${item.code}" title="画像表示">📷</button>
+        </div>
+        <span>×${item.qty}</span>
+      ${item.memo ? `<span class="memo">${item.memo}</span>` : ''}
+    </div>
+    <button data-indices='${item.indices.join(',')}' class='small-btn checkBtn'>${texts[lang].check}</button>`;
+  el.appendChild(div);
+
+          
+          // インライン数量指定ボックスを挿入する場所
+          const placeholder = document.createElement('div');
+          placeholder.id = `inline-box-${firstIndex}`;
+          el.appendChild(placeholder);
+        });
+      }
+      
+      document.querySelectorAll('.checkBtn').forEach(btn=>btn.onclick=e=>{
+        const indices = e.target.dataset.indices.split(',').map(Number).sort((a,b) => b-a);
+        // 該当する全ての商品を丸ごとチェック済みに移動（後ろから削除、コピーを作成）
+        indices.forEach(i => {
+          checkedList.push({...checklist[i]});
+          checklist.splice(i,1);
+        });
+        saveData(); renderChecklist(); renderChecked();
+      });
+      
+      // コードクリックでインライン数量指定ボックスを表示
+      document.querySelectorAll('.code-clickable').forEach(span=>span.onclick=e=>{
+        const indices = e.target.dataset.indices.split(',').map(Number);
+        const firstIndex = indices[0];
+
+        // 集約された数量を計算
+        let totalQty = 0;
+        let aggregatedItem = {code: '', memo: '', groupId: null};
+        indices.forEach(i => {
+          totalQty += checklist[i].qty;
+          aggregatedItem = checklist[i];
+        });
+
+        const placeholder = document.getElementById(`inline-box-${firstIndex}`);
+
+        // 既に開いている場合は閉じる
+        if(placeholder.innerHTML !== '') {
+          placeholder.innerHTML = '';
+          return;
+        }
+
+        createInlineCheckBox(aggregatedItem.code, totalQty, indices, firstIndex, placeholder);
+      });
+    // 📋 コピーボタンの処理
+      document.querySelectorAll('#checklist .copy-btn:not(.ikea-img-btn)').forEach(btn => {
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          copyToClipboard(e.target.dataset.code, e.target);
+        };
+      });
+
+      // 📷 IKEA画像ボタンの処理
+      document.querySelectorAll('#checklist .ikea-img-btn').forEach(btn => {
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          const code = e.target.dataset.code;
+          fetchIkeaProductImage(code);
+        };
+      });
+    }
+
+    function renderChecked(){
+      const el=document.getElementById('checkedList'); el.innerHTML='';
+      const grouped = {};
+      checkedList.forEach(it=>{
+        if(grouped[it.code]) {
+          grouped[it.code].qty+=it.qty;
+          // メモを統合（Set で重複を防ぐ）
+          if(it.memo) {
+            const memos = grouped[it.code].memo ? grouped[it.code].memo.split(', ') : [];
+            if(!memos.includes(it.memo)) {
+              memos.push(it.memo);
+              grouped[it.code].memo = memos.join(', ');
+            }
+          }
+        } else {
+          grouped[it.code]={...it};
+        }
+      });
+      
+      const groupedArray = Object.values(grouped);
+      groupedArray.forEach((it, i)=>{
+        const div=document.createElement('div');
+        div.className='list-item';
+        div.innerHTML=`
+          <div class="item-left">
+            <span>${it.code} ×${it.qty}</span>
+            ${it.memo?`<span class="memo">${it.memo}</span>`:''}
+          </div>
+          <button data-i='${i}' class='small-btn removeCheckedBtn'>${texts[lang].del}</button>`;
+        el.appendChild(div);
+      });
+      document.querySelectorAll('.removeCheckedBtn').forEach(btn=>btn.onclick=e=>{
+        const code = groupedArray[e.target.dataset.i].code;
+        checkedList = checkedList.filter(it => it.code !== code);
+        saveData(); renderChecked();
+      });
+       
+    }
+
+    function renderGroups(){
+      const el=document.getElementById('groupsList'); el.innerHTML='';
+      groups.forEach((group,i)=>{
+        const div=document.createElement('div');
+        div.className='group-item';
+        div.innerHTML=`
+          <div style="display:flex;align-items:center;gap:10px;flex:1;">
+            <div class="group-color" style="background:${group.color}"></div>
+            <input type="text" class="small-input group-name-input" data-i="${i}" value="${group.name}" style="flex:1;">
+            <input type="color" class="group-color-input" data-i="${i}" value="${group.color}">
+          </div>
+          <button data-i='${i}' class='small-btn delGroupBtn'>${texts[lang].del}</button>`;
+        el.appendChild(div);
+      });
+      document.querySelectorAll('.group-name-input').forEach(input=>input.onchange=e=>{
+        groups[e.target.dataset.i].name=e.target.value; saveData(); renderPrecheck(); renderChecklist();
+      });
+      document.querySelectorAll('.group-color-input').forEach(input=>input.onchange=e=>{
+        groups[e.target.dataset.i].color=e.target.value; saveData(); renderChecklist();
+      });
+      document.querySelectorAll('.delGroupBtn').forEach(btn=>btn.onclick=e=>{
+        if(confirm(texts[lang].confirmDeleteGroup)){
+          const groupId = groups[e.target.dataset.i].id;
+          groups.splice(e.target.dataset.i,1);
+          // このグループを使用している商品からグループIDを削除
+          precheckList.forEach(item => {
+            if(item.groupId === groupId) item.groupId = null;
+          });
+          checklist.forEach(item => {
+            if(item.groupId === groupId) item.groupId = null;
+          });
+          checkedList.forEach(item => {
+            if(item.groupId === groupId) item.groupId = null;
+          });
+          saveData(); renderGroups(); renderPrecheck(); renderChecklist();
+        }
+      });
+    }
+
+    function updateBulkGroupSelect(){
+      const select = document.getElementById('bulkGroupSelect');
+      select.innerHTML = `<option value="">${texts[lang].selectGroup}</option>`;
+      groups.forEach(g => {
+        select.innerHTML += `<option value="${g.id}">${g.name}</option>`;
+      });
+    }
+
+    document.getElementById('selectAllBtn').onclick = () => {
+      precheckList.forEach(item => item.selected = true);
+      renderPrecheck();
+    };
+
+    document.getElementById('deselectAllBtn').onclick = () => {
+      precheckList.forEach(item => item.selected = false);
+      renderPrecheck();
+    };
+
+    document.getElementById('bulkGroupBtn').onclick = () => {
+      const selectedGroupId = document.getElementById('bulkGroupSelect').value;
+      if(!selectedGroupId) return alert(texts[lang].noGroupSelected);
+      
+      const selectedItems = precheckList.filter(item => item.selected);
+      if(selectedItems.length === 0) return alert(texts[lang].noItemSelected);
+      
+      precheckList.forEach(item => {
+        if(item.selected) {
+          item.groupId = selectedGroupId;
+          item.selected = false;
+        }
+      });
+      
+      saveData();
+      renderPrecheck();
+    };
+
+// 🔹 IKEA商品情報をモーダルで表示する関数
+function fetchIkeaProductImage(code) {
+  // ドットやスペースを除去して8桁の数字のみにする
+  const cleanCode = code.replace(/[.\s]/g, '');
+  
+  // IKEAの商品番号形式: 最初の3桁.次の3桁.最後の2桁
+  let formattedCode = cleanCode;
+  if (cleanCode.length === 8) {
+    formattedCode = `${cleanCode.slice(0, 3)}.${cleanCode.slice(3, 6)}.${cleanCode.slice(6, 8)}`;
+  }
+
+  const existing = document.getElementById('ikeaModal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'ikeaModal';
+  modal.style.cssText = `
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  `;
+
+  modal.innerHTML = `
+    <div style="
+      background:#fff;
+      padding:16px;
+      border-radius:10px;
+      box-shadow:0 4px 8px rgba(0,0,0,0.2);
+      text-align:center;
+      max-width:360px;
+      max-height:80vh;
+      overflow-y:auto;
+    ">
+      <h3 style="margin:0 0 12px 0;font-size:16px;color:#333;">IKEA商品: ${formattedCode}</h3>
+      
+      <div style="margin-bottom:12px;">
+        <a href="https://www.ikea.com/jp/ja/search/?q=${cleanCode}" target="_blank"
+           style="display:inline-block;padding:10px 20px;background:#0058a3;color:#fff;text-decoration:none;border-radius:5px;font-size:14px;font-weight:500;">
+           🔍 IKEA公式で検索
+        </a>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <a href="https://www.google.com/search?q=IKEA+${formattedCode}+${cleanCode}&tbm=isch" target="_blank"
+           style="display:inline-block;padding:10px 20px;background:#4285f4;color:#fff;text-decoration:none;border-radius:5px;font-size:14px;font-weight:500;">
+           🖼️ Google画像検索
+        </a>
+      </div>
+
+      <div style="background:#f5f7fa;padding:12px;border-radius:5px;margin-bottom:12px;">
+        <p style="margin:0;font-size:13px;color:#555;line-height:1.5;">
+          <strong>商品番号:</strong><br>
+          <span style="font-family:monospace;font-size:14px;color:#0058a3;">${formattedCode}</span>
+          <button class="copy-code-btn" style="margin-left:8px;padding:4px 8px;border:none;background:#3498db;color:#fff;border-radius:3px;cursor:pointer;font-size:12px;">
+            📋 コピー
+          </button>
+        </p>
+      </div>
+
+      <div style="font-size:12px;color:#777;margin-bottom:12px;line-height:1.4;">
+        💡 ヒント: 上のボタンから公式サイトや画像検索で商品を確認できます
+      </div>
+
+      <button id="ikeaCloseBtn" style="
+        width:100%;
+        padding:10px 16px;
+        border:none;
+        background:#95a5a6;
+        color:#fff;
+        border-radius:5px;
+        cursor:pointer;
+        font-size:14px;
+        font-weight:500;
+      ">閉じる</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+  
+  // コードコピー機能
+  modal.querySelector('.copy-code-btn').onclick = async (e) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(formattedCode);
+      const btn = e.target;
+      const originalText = btn.textContent;
+      btn.textContent = '✓ コピー済み';
+      btn.style.background = '#27ae60';
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '#3498db';
+      }, 1500);
+    } catch (err) {
+      console.error('コピー失敗:', err);
+    }
+  };
+  
+  document.getElementById('ikeaCloseBtn').onclick = () => modal.remove();
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+}
+    document.getElementById('addGroupBtn').onclick=()=>{
+      const name=document.getElementById('groupNameInput').value.trim();
+      const color=document.getElementById('groupColorInput').value;
+      if(!name) return alert(texts[lang].alertGroupName);
+      groups.push({id:Date.now().toString(),name,color}); 
+      saveData(); renderGroups(); renderPrecheck(); updateBulkGroupSelect();
+      document.getElementById('groupNameInput').value='';
+    };
+
+   document.getElementById('addProductBtn').onclick=()=>{
+  const code=document.getElementById('productCodeInput').value.trim();
+  // ✅ ドット付き（例: 204.393.92）や8桁数字を許可
+ // if(/^(?:\d[.\s]?){8}$/.test(code)) fetchIkeaProductImage(code);
+  
+  const qty=Number(document.getElementById('productQtyInput').value)||1;
+  const memo=document.getElementById('productMemoInput').value.trim();
+
+  // ✅ 同じく8桁 or ドット対応
+  if(!/^(?:\d[.\s]?){8}$/.test(code)) return alert(texts[lang].alertCode);
+  if(qty <= 0) return alert(texts[lang].invalidQty);
+
+      precheckList.push({id:Date.now().toString(),code,qty,memo,selected:false}); saveData(); renderPrecheck();
+      document.getElementById('productCodeInput').value=''; document.getElementById('productMemoInput').value='';
+    };
+
+    document.getElementById('ocrBtn').onclick=()=>{
+      const input=document.createElement('input'); input.type='file'; input.accept='image/*'; input.capture='environment';
+      input.onchange=async(e)=>{
+        const file=e.target.files[0];
+        if(!file) return;
+        const result=await Tesseract.recognize(file,'eng',{ tessedit_char_whitelist:'0123456789' });
+      // ✅ 8桁 or ドット付き数字にも対応
+const codes=result.data.text.match(/(?:\d[.\s]?){8}/g)||[];
+
+        const uniqueCodes = [...new Set(codes)];
+        if(uniqueCodes.length){
+          if(confirm(`${uniqueCodes.length}${texts[lang].confirmAdd}`)){
+            uniqueCodes.forEach(c=>precheckList.push({id:Date.now().toString()+Math.random(),code:c,qty:1,memo:'',selected:false}));
+            saveData(); renderPrecheck();
+          }
+        }else{
+          alert(texts[lang].noCode);
+        }
+      };
+      input.click();
+    };
+
+    document.getElementById('precheckConfirm').onclick=()=>{ checklist.push(...precheckList); precheckList=[]; saveData(); renderPrecheck(); renderChecklist(); showPage('page-checklist'); };
+
+    document.getElementById('searchBtn').onclick=()=>{
+      const searchCode = document.getElementById('searchCodeInput').value.trim();
+      if(!searchCode) return;
+      
+      // チェックリストから検索（同じコード+グループの組み合わせを全て取得）
+      const matches = [];
+      checklist.forEach((item, i) => {
+        if(item.code === searchCode) {
+          const key = `${item.code}_${item.groupId || 'nogroup'}`;
+          let match = matches.find(m => m.key === key);
+          if(!match) {
+            match = {key, indices: [], totalQty: 0, item: item};
+            matches.push(match);
+          }
+          match.indices.push(i);
+          match.totalQty += item.qty;
+        }
+      });
+      
+      if(matches.length > 0) {
+        // 最初のマッチを表示（複数グループにまたがる場合は最初のグループ）
+        const firstMatch = matches[0];
+        const firstIndex = firstMatch.indices[0];
+        const placeholder = document.getElementById(`inline-box-${firstIndex}`);
+        
+        // 他の開いているボックスを全て閉じる
+        document.querySelectorAll('[id^="inline-box-"]').forEach(box => box.innerHTML = '');
+        
+        // ハイライトをリセット
+        document.querySelectorAll('.list-item').forEach(el => {
+          el.style.backgroundColor = '';
+          el.style.border = '1px solid #e1e8ed';
+        });
+
+        // 見つかった項目をハイライト
+        const element = document.getElementById(`checklist-item-${firstIndex}`);
+        if(element) {
+          element.style.backgroundColor = '#fff3cd';
+          element.style.border = '2px solid #ffc107';
+        }
+
+        // インライン数量指定ボックスを自動表示
+        createInlineCheckBox(firstMatch.item.code, firstMatch.totalQty, firstMatch.indices, firstIndex, placeholder, () => {
+          element.style.backgroundColor = '';
+          element.style.border = '1px solid #e1e8ed';
+        });
+        
+        document.getElementById('searchCodeInput').value = '';
+      } else {
+        alert(texts[lang].notFound);
+      }
+    };
+
+    // Enterキーでも検索できるように
+    document.getElementById('searchCodeInput').addEventListener('keypress', (e) => {
+      if(e.key === 'Enter') {
+        document.getElementById('searchBtn').click();
+      }
+    });
+
+    document.getElementById('precheckReset').onclick=()=>{ if(confirm(texts[lang].confirmReset)){ precheckList=[]; saveData(); renderPrecheck(); } };
+    document.getElementById('checklistReset').onclick=()=>{ if(confirm(texts[lang].confirmChecklistReset)){ checklist=[]; saveData(); renderChecklist(); } };
+
+    document.getElementById('navPrecheck').onclick = () => showPage('page-precheck');
+    document.getElementById('navChecklist').onclick = () => showPage('page-checklist');
+    document.getElementById('navChecked').onclick = () => showPage('page-checked');
+    document.getElementById('navGroups').onclick = () => showPage('page-groups');
+
+    // イベント委譲: precheckList
+    document.getElementById('precheckList').addEventListener('click', (e) => {
+      const id = e.target.dataset.id;
+      if(!id) return;
+
+      if(e.target.classList.contains('removeBtn')){
+        precheckList = precheckList.filter(item => item.id !== id);
+        saveData();
+        renderPrecheck();
+      }
+    });
+
+    document.getElementById('precheckList').addEventListener('change', (e) => {
+      const id = e.target.dataset.id;
+      if(!id) return;
+
+      const item = findItemById(precheckList, id);
+      if(!item) return;
+
+      if(e.target.classList.contains('item-checkbox')){
+        item.selected = e.target.checked;
+      } else if(e.target.classList.contains('qty')){
+        const newQty = Number(e.target.value);
+        if(newQty > 0 && !isNaN(newQty)){
+          item.qty = newQty;
+          saveData();
+        } else {
+          e.target.value = item.qty;
+        }
+      } else if(e.target.classList.contains('memo')){
+        item.memo = e.target.value;
+        saveData();
+      } else if(e.target.classList.contains('group-select')){
+        item.groupId = e.target.value || null;
+        saveData();
+      }
+    });
+
+    // パスワード・ログイン入力欄でEnterキー対応
+    document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+      if(e.key === 'Enter') document.getElementById('passwordSubmit').click();
+    });
+
+    document.getElementById('userIdInput').addEventListener('keypress', (e) => {
+      if(e.key === 'Enter') document.getElementById('loginSubmit').click();
+    });
+
+// ページ読み込み時に前回のユーザーIDを復元
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUser = localStorage.getItem('indent:user');
+      if (savedUser) {
+        currentUserId = savedUser;
+        loadUserData();
+        document.getElementById('userDisplay').textContent = `${texts[lang].currentUser} ${currentUserId}`;
+        document.getElementById('userDisplay').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'block';
+        
+        // データを読み込んでから再描画
+        renderPrecheck();
+        renderChecklist();
+        renderChecked();
+        renderGroups();
+        updateBulkGroupSelect();
+        
+        showPage('page-precheck');
+      }
+      
+      applyLang();
+    });
+  </script>
+</body>
+</html>
+
+
